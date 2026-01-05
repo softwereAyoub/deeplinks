@@ -1,0 +1,11 @@
+import { createBrowserClient } from '@supabase/ssr';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error("Supabase URL or Key is missing. Check your .env.local file.");
+}
+
+// استخدام createBrowserClient لضمان عمل الـ Auth مع الـ Middleware و الـ SSR
+export const supabase = createBrowserClient(supabaseUrl, supabaseKey);
