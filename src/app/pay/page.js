@@ -53,6 +53,7 @@ export default function UpgradeButton() {
       window.Paddle.Initialize({ 
         token: 'test_98ee8848025f8371d2bc08c1caa', // استبدله بـ Vendor ID الخاص بك
       });
+setTimeout(() => {
 
       window.Paddle.Checkout.open({
         settings: {
@@ -67,6 +68,8 @@ export default function UpgradeButton() {
         userId: '17256a3a-337a-4374-b64e-0514140f0620' // لربط الدفع بالمستخدم في Supabase
         }
       });
+}, 200);
+    
     }
   };
 
