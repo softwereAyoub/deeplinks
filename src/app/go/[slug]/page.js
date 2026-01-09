@@ -307,23 +307,32 @@ if (platform === 'youtube') {
 }
 
 // 3. محاولة الفتح التلقائي
+
+
+// 1. محاولة فتح التطبيق تلقائياً
 window.location.href = deepLink;
 setDeepLink(deepLink);
 
-// 4. بدلاً من الذهاب للمتصفح فوراً، ننتظر 2.5 ثانية
-// إذا لم يغادر المستخدم الصفحة (بسبب Alert إنستغرام أو Cancel)، نظهر الزر اليدوي
+// 2. مراقبة النتيجة
+const start = Date.now();
 const timeout = setTimeout(() => {
-  setShowManualButton(true); // تأكد من تعريف هذه الحالة بـ useState(false)
-}, 2500);
+  const delta = Date.now() - start;
+  
+  // إذا مر وقت طويل ولم يخرج المستخدم من الصفحة، فهذا يعني أن التطبيق غالباً غير موجود
+  if (delta < 2500) { 
+     // إظهار الزر اليدوي كـ "نداء أخير" (Last Call)
+     setShowManualButton(true);
+     
+     // بعد ظهور الزر بـ 3 ثوانٍ، إذا لم يضغط المستخدم، نفتح المتصفح تلقائياً
+     setTimeout(() => {
+        window.location.replace(originalUrl);
+     }, 3000);
+  }
+}, 2000);
 
-// إذا نجح التحويل وخرج المستخدم من المتصفح، نلغي التايم آوت
 window.onblur = () => clearTimeout(timeout);
 
-      // setTimeout(() => {
-      //   if (Date.now() - start < 2000) {
-      //     window.location.replace(originalUrl);
-      //   }
-      // },10);
+    
     };
 
     performRedirect();
