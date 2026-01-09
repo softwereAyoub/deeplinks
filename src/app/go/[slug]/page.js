@@ -163,7 +163,7 @@ export default function RedirectPage({ params }) {
   const slug =  decodeURIComponent(unwrappedParams.slug);
 ;
   const [isExpired, setIsExpired] = useState(false);
-  const [error, setError] = useState(null);
+  const [platforme, setPlatform] = useState(null);
 
   useEffect(() => {
     const performRedirect = async () => {
@@ -243,39 +243,67 @@ export default function RedirectPage({ params }) {
 
 
       // 3. منطق التحويل الاحترافي (Deep Linking Logic)
-      const { original_url: originalUrl, platform } = linkData;
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      const isAndroid = /android/i.test(userAgent);
-      const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+//       const { original_url: originalUrl, platform } = linkData;
+//       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+//       const isAndroid = /android/i.test(userAgent);
+//       const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+// setPlatform(platform);
+//       let deepLink = originalUrl;
 
-      let deepLink = originalUrl;
+//       // تنسيق الروابط العميقة بناءً على المنصة ونظام التشغيل
+//       if (platform === 'youtube') {
+//         const videoId = originalUrl.split('v=')[1]?.split('&')[0] || originalUrl.split('/').pop();
+//         deepLink = isIOS ? `youtube://www.youtube.com/watch?v=${videoId}` : `intent://www.youtube.com/watch?v=${videoId}#Intent;package=com.google.android.youtube;scheme=https;end`;
+//       } 
+//       else if (platform === 'amazon') {
+//         // تحويل الرابط لصيغة تفهمها أمازون مباشرة
+//         const cleanUrl = originalUrl.replace(/https?:\/\//, "");
+//         deepLink = isIOS ? `com.amazon.mobile.shopping://www.${cleanUrl}` : `intent://${cleanUrl}#Intent;scheme=https;package=com.amazon.mp3;end`;
+//       }
+//       else if (platform === 'instagram') {
+//         deepLink = `instagram://details?id=${originalUrl}`;
+//       }
 
-      // تنسيق الروابط العميقة بناءً على المنصة ونظام التشغيل
-      if (platform === 'youtube') {
-        const videoId = originalUrl.split('v=')[1]?.split('&')[0] || originalUrl.split('/').pop();
-        deepLink = isIOS ? `youtube://www.youtube.com/watch?v=${videoId}` : `intent://www.youtube.com/watch?v=${videoId}#Intent;package=com.google.android.youtube;scheme=https;end`;
-      } 
-      else if (platform === 'amazon') {
-        // تحويل الرابط لصيغة تفهمها أمازون مباشرة
-        const cleanUrl = originalUrl.replace(/https?:\/\//, "");
-        deepLink = isIOS ? `com.amazon.mobile.shopping://www.${cleanUrl}` : `intent://${cleanUrl}#Intent;scheme=https;package=com.amazon.mp3;end`;
-      }
-      else if (platform === 'instagram') {
-        deepLink = `instagram://details?id=${originalUrl}`;
-      }
+//       // محاولة فتح التطبيق
+//       if (deepLink !== originalUrl) {
+//         window.location.href = deepLink;
+//       }
 
-      // محاولة فتح التطبيق
-      if (deepLink !== originalUrl) {
-        window.location.href = deepLink;
-      }
+//       // Fallback: إذا لم يفتح التطبيق خلال ثانية ونصف، افتح المتصفح العادي
+//       const timeout = setTimeout(() => {
+//         window.location.replace(originalUrl);
+//       }, 1200);
 
-      // Fallback: إذا لم يفتح التطبيق خلال ثانية ونصف، افتح المتصفح العادي
-      const timeout = setTimeout(() => {
-        window.location.replace(originalUrl);
-      }, 1200);
+//       // تنظيف التايم آوت في حال خرج المستخدم من المتصفح
+//       window.onblur = () => clearTimeout(timeout);
 
-      // تنظيف التايم آوت في حال خرج المستخدم من المتصفح
-      window.onblur = () => clearTimeout(timeout);
+await new Promise(resolve => setTimeout(resolve, 800));
+
+    // 3. منطق التحويل (Deep Linking)
+    const { original_url: originalUrl, platform } = linkData;
+        setPlatform(platform);
+
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isAndroid = /android/i.test(userAgent);
+
+    let deepLink = originalUrl;
+    if (platform === 'youtube') {
+      const videoId = originalUrl.split('v=')[1]?.split('&')[0] || originalUrl.split('/').pop();
+      deepLink = isAndroid 
+        ? `intent://www.youtube.com/watch?v=${videoId}#Intent;package=com.google.android.youtube;scheme=https;end`
+        : `youtube://www.youtube.com/watch?v=${videoId}`;
+    }
+    // ... بقية المنصات
+
+    // 4. محاولة الفتح
+    window.location.href = deepLink;
+
+    // Fallback للمتصفح العادي
+    const timeout = setTimeout(() => {
+      window.location.replace(originalUrl);
+    }, 1500);
+
+    window.onblur = () => clearTimeout(timeout);
 
       // setTimeout(() => {
       //   if (Date.now() - start < 2000) {
@@ -321,10 +349,61 @@ export default function RedirectPage({ params }) {
     );
   }
 
+  // return (
+  //   <div className="flex flex-col items-center justify-center h-screen bg-white">
+  //     <div className="h-15 w-15 rounded-full border-4 border-slate-100 border-t-indigo-600 animate-spin"></div>
+  //     {/* <h2 className="mt-6 text-xl font-bold text-slate-800">Opening ...</h2> */}
+  //   </div>
+  // );
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-white">
-      <div className="h-15 w-15 rounded-full border-4 border-slate-100 border-t-indigo-600 animate-spin"></div>
-      {/* <h2 className="mt-6 text-xl font-bold text-slate-800">Opening ...</h2> */}
+  <div className="flex flex-col items-center justify-center h-screen bg-slate-50">
+    {/* بطاقة مركزية لإعطاء شعور بالرسمية */}
+    <div className="flex flex-col items-center max-w-sm w-full px-6 py-12 bg-white rounded-[2.5rem] shadow-sm border border-slate-100">
+      
+      {/* أيقونة التطبيق المستهدف (الديناميكية) */}
+      <div className="relative mb-8">
+        <div className="h-20 w-20 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 overflow-hidden shadow-inner">
+          {platforme === 'amazon' && (
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" className="w-12 h-12" alt="Amazon" />
+          )}
+          {platforme === 'youtube' && (
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" className="w-12 h-12" alt="YouTube" />
+          )}
+          {!['amazon', 'youtube'].includes(platforme) && (
+             <div className="h-10 w-10 bg-indigo-100 rounded-full animate-pulse" />
+          )}
+        </div>
+        {/* Spinner صغير يدور حول الأيقونة */}
+        <div className="absolute -inset-2 border-2 border-transparent border-t-indigo-500 rounded-full animate-spin"></div>
+      </div>
+
+      {/* نصوص التوجيه */}
+      <h2 className="text-xl font-bold text-slate-800 mb-2">
+        Opening Official App
+      </h2>
+      <p className="text-slate-500 text-center text-sm leading-relaxed mb-6">
+        Connecting you safely to <br />
+        <span className="font-semibold text-slate-700">{platforme || 'the destination'}</span>
+      </p>
+
+      {/* شريط تقدم بسيط (Progress Bar) لإعطاء إيحاء بالسرعة */}
+      <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-full bg-indigo-600 animate-[loading_1.5s_ease-in-out_infinite] w-1/2 rounded-full"></div>
+      </div>
+
+      {/* ملاحظة صغيرة لتهيئة المستخدم للتنبيه (The Alert) */}
+      <p className="mt-8 text-[11px] text-slate-400 uppercase tracking-widest font-medium">
+        Secure Redirect by YourBrand
+      </p>
     </div>
-  );
+
+    {/* ستايل الأنميشن للشريط */}
+    <style jsx>{`
+      @keyframes loading {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(250%); }
+      }
+    `}</style>
+  </div>
+);
 }
