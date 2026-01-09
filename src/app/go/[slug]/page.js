@@ -165,6 +165,8 @@ export default function RedirectPage({ params }) {
 const [showManualButton, setShowManualButton] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [platforme, setPlatform] = useState(null);
+  const [deeplinke, setDeepLink] = useState(null);
+  const [original_urle, setUrl] = useState(null);
 
   useEffect(() => {
     const performRedirect = async () => {
@@ -290,6 +292,8 @@ const isAndroid = /android/i.test(userAgent);
 const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
 
 let deepLink = originalUrl;
+setDeepLink(deepLink);
+setUrl(originalUrl);
 
 if (platform === 'youtube') {
   const videoId = originalUrl.split('v=')[1]?.split('&')[0] || originalUrl.split('/').pop();
@@ -372,9 +376,9 @@ return (
       {/* أيقونة المنصة مع Spinner */}
       <div className="relative mb-8">
         <div className="h-20 w-20 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 overflow-hidden shadow-inner">
-          {platform === 'amazon' ? (
+          {platforme === 'amazon' ? (
             <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" className="w-12 h-12" />
-          ) : platform === 'youtube' ? (
+          ) : platforme === 'youtube' ? (
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" className="w-12 h-12" />
           ) : (
             <div className="h-10 w-10 bg-indigo-100 rounded-full animate-pulse" />
@@ -392,21 +396,21 @@ return (
       <p className="text-slate-500 text-center text-sm mb-8">
         {showManualButton 
           ? "If the app didn't open automatically, please use the button below."
-          : `Connecting you safely to ${platform || 'the app'}...`}
+          : `Connecting you safely to ${platforme || 'the app'}...`}
       </p>
 
       {/* التبديل بين شريط التحميل والزر اليدوي */}
       {showManualButton ? (
         <div className="w-full space-y-4">
           <button 
-            onClick={() => window.location.href = deepLink}
+            onClick={() => window.location.href = deeplinke }
             className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 active:scale-95 transition-transform"
           >
             Open in App
           </button>
           
           <button 
-            onClick={() => window.location.replace(originalUrl)}
+            onClick={() => window.location.replace(original_urle)}
             className="w-full py-3 text-slate-400 text-sm font-medium"
           >
             Continue in Browser
