@@ -16,11 +16,14 @@ import {
   Instagram,
   Globe,
   Music2,
-  LogOut
+  LogOut,
+  ShieldAlert,
+  ShieldCheck
 } from 'lucide-react';
 import { Menu, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-
+import Link from 'next/link';
+import Swal from 'sweetalert2';
 
 
 
@@ -33,7 +36,12 @@ const [copied, setCopied] = useState(false);
 const [userId, setUserId] = useState(null);
 const [userEmail, setUserEmail] = useState('');
 const [loading, setLoading] = useState(false);
-const [paddle, setPaddle] = useState(null);
+const [isSubscribed, setSubs] = useState(true);
+const [customSlug, setCustomSlug] = useState('');
+const [slugError, setSlugError] = useState('');
+const [host, setHost] = useState('');
+
+const [isLimitReached, setIsLimitReached] = useState(false);
 const copyToClipboard = async () => {
   if (!generatedLink) return;
 
@@ -54,16 +62,95 @@ const fetchDataUser = async () => {
     // 1. جلب بيانات المستخدم الحالي
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      alert("Please login first");
+      // alert("Please login first");
+       Swal.fire({
+  icon: "error",
+  title: "⚠️ Please login first",
+  text: "You can create up to 10 links per 20 hours. Please wait before creating more.",
+});
       return;
     }
 
     setUserId(user.id);
     setUserEmail(user.email);
+
+    const { data: profile, error: profileError } = await supabase
+  .from('profiles')
+  .select('is_subscribed, subscription_plan')
+  .eq('id', user.id)
+  .maybeSingle(); 
+    // const isPro = profile.is_subscribed === true;
+    setSubs(profile.is_subscribed === true);
+if(profile.is_subscribed === true){
+      const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const { count } = await supabase
+    .from('links')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+  .gt('created_at', new Date(Date.now() - (20 * 60 * 60 * 1000)).toISOString()); // آخر ساعة
+
+  // إذا وصل لـ 10 روابط وهو ليس PRO
+  if (count > 9) {
+    setIsLimitReached(true);
+  }
+}else{
+   const { count } = await supabase
+    .from('links')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+
+   if (count > 1) {
+    setIsLimitReached(true);
+  }
+}
+
+
+
 }
 useEffect(() => {
 fetchDataUser()
+  setHost(window.location.host);
+
+
 }, []);
+
+const checkUserSubscription = async () => {
+   const { data: profile, error: profileError } = await supabase
+  .from('profiles')
+  .select('is_subscribed, subscription_plan')
+  .eq('id', userId)
+  .maybeSingle(); 
+    // const isPro = profile.is_subscribed === true;
+    setSubs(profile.is_subscribed === true);
+    if(profile.is_subscribed === true && isLimitReached  ){
+      setIsLimitReached(false);
+            console.log("testtttttttttttttttttttttt");
+
+    }
+}
+
+useEffect(() => {
+  const handleFocus = () => {
+    // لا تفحص إلا إذا كان المستخدم مسجلاً أصلاً ولم يصبح PRO بعد
+    if (userId && !isSubscribed) {
+      console.log("Welcome back! Checking payment status...");
+  
+      setTimeout(async()=>{
+        checkUserSubscription()
+      },1800)
+      
+      // دالة تجلب بيانات المستخدم من Supabase
+
+    }
+  };
+
+  window.addEventListener('focus', handleFocus);
+  return () => window.removeEventListener('focus', handleFocus);
+}, [userId, isSubscribed,isLimitReached]); // يعتمد على هذه القيم ليكون ذكياً
+
+
   // منطق التعرف التلقائي على المنصة
 useEffect(() => {
     const lowerUrl = url.toLowerCase();
@@ -89,71 +176,65 @@ const handleLogout = async () => {
   }
 };
 
-// const handleGenerate = async () => {
-//   // 1. التحقق من أن الحقل ليس فارغاً
-//   if (!url || url.trim() === '') {
-//     alert("Please paste a valid URL first!");
-//     return;
-//   }
-  
 
-//   try {
-//     // 2. توليد كود فريد (Slug) قصير (مثلاً: 6 رموز)
-//     // يمكنك استخدام Math.random أو مكتبة nanoid
-//     const { data: { user } } = await supabase.auth.getUser();
-
-//   if (!user) {
-//     alert("You must be logged in!");
-//     window.location.href = '/login';
-//     return;
-//   }
-//     const slug = Math.random().toString(36).substring(2, 8);
-
-//     // 3. إرسال البيانات إلى جدول 'links' في Supabase
-//     const { data, error } = await supabase
-//       .from('links')
-//       .insert([
-//         { 
-//           slug: slug, 
-//           original_url: url, 
-//           platform: platform,
-//           user_id:user.id, // المنصة التي تعرف عليها الكود تلقائياً
-//           clicks: 0 
-//         }
-//       ])
-//       .select(); // جلب البيانات بعد الإدخال للتأكد
-
-//     if (error) throw error;
-
-//     // 4. إنشاء الرابط النهائي الذي سيستخدمه الزبون
-//     // window.location.origin تجلب دومين موقعك تلقائياً (localhost أو الدومين الحقيقي)
-//     const finalLink = `${window.location.origin}/go/${slug}`;
-    
-//     // 5. تحديث حالة الرابط المنشأ ليظهر في الواجهة
-//     setGeneratedLink(finalLink);
-    
-//     console.log("Link saved successfully:", data);
-
-//   } catch (error) {
-//     console.error("Error saving to Supabase:", error.message);
-//     alert("Failed to generate link. Please check your database connection.");
-//   }
-// };
 
   // أيقونة المنصة المتغيرة
 
 
 
-const handleGenerate = async () => {
+const handleGenerate = async (e) => {
+e.preventDefault();
   setLoading(true);
-
+setSlugError('');
   try {
+    // مثال بسيط داخل دالة إنشاء الرابط
+
+
+    let slug = customSlug.trim();
+    // const slug = Math.random().toString(36).substring(2, 8);
+
+  // 1. إذا اختار المستخدم slug مخصص، نتحقق من توفره
+  if (slug) {
+    const { data: existing } = await supabase
+      .from('links')
+      .select('slug')
+      .eq('slug', slug)
+      .single();
+
+    if (existing) {
+      setSlugError('This custom link is already taken. Try another one , (Add numbers or symbols!)');
+      return;
+    }
+  } else {
+    // 2. إذا لم يختر، نولد واحد عشوائي
+    slug = Math.random().toString(36).substring(2, 8);; 
+  }
     // 1. جلب بيانات المستخدم الحالي
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      alert("Please login first");
+      // alert("Please login first");
+        Swal.fire({
+  icon: "error",
+  title: "⚠️ Please login first",
+  text: "You can create up to 10 links per 20 hours. Please wait before creating more.",
+});
       return;
     }
+const { count, error } = await supabase
+  .from('links')
+  .select('*', { count: 'exact', head: true })
+  .eq('user_id', user.id)
+  .gt('created_at', new Date(Date.now() - (20 * 60 * 60 * 1000)).toISOString()); // آخر ساعة
+
+if (count > 9) { // حد أقصى 10 رابط في الساعة للمجاني
+  return      Swal.fire({
+  icon: "error",
+  title: "⚠️ Rate Limit Exceeded",
+  text: "You can create up to 10 links per 20 hours. Please wait before creating more.",
+});
+  // alert("⚠️ Rate Limit Exceeded: You can create up to 10 links per 20 hours. Please wait before creating more.");
+   
+}
 
     setUserId(user.id);
     setUserEmail(user.email);
@@ -183,16 +264,23 @@ console.log("User Status:", { isSubscribed, plan });
 
     // 4. التحقق من الصلاحيات (Logic)
     const isPro = profile.is_subscribed === true;
-    
+    setSubs(isPro);
     // إذا لم يكن مشتركاً وحاول إنشاء أكثر من رابط واحد
     if (!isPro && linksCount >= 1) {
-      alert("⚠️ Free Plan Limit: You can only create 1 link. Please upgrade to Pro for unlimited access!");
+
+      // alert("⚠️ Free Plan Limit: You can only create 1 link. Please upgrade to Pro for unlimited access!");
+      Swal.fire({
+  icon: "error",
+  title: "⚠️ Free Plan Limit",
+  text: "You can only create 1 link. Please upgrade to Pro for unlimited access!",
+});
+          setIsLimitReached(true);
+
       setLoading(false);
       return; 
     }
 
     // 5. توليد السلوج (Slug)
-    const slug = Math.random().toString(36).substring(2, 8);
 
     // 6. تحديد تاريخ الانتهاء (إذا كان مجاني ينتهي بعد 24 ساعة)
     // ملاحظة: يجب أن تضيف عمود expires_at في جدول links في سوبابيس إذا أردت تفعيل ميزة الـ 24 ساعة
@@ -220,13 +308,29 @@ console.log("User Status:", { isSubscribed, plan });
     
     // 5. تحديث حالة الرابط المنشأ ليظهر في الواجهة
     setGeneratedLink(finalLink);
-    alert(isPro ? "Link generated successfully!" : "Temporary link generated (Valid for 24h)");
+    // alert(isPro ? "Link generated successfully!" : "Temporary link generated (Valid for 24h)");
+    isPro ?     Swal.fire({
+  title: "Link generated successfully!",
+  icon: "success"
+})
+ : 
+   Swal.fire({
+  title: "Temporary link generated (Valid for 24h)",
+  icon: "success"
+})
+ 
+
     // تحديث الواجهة أو جلب الروابط مجدداً
     // fetchDashboardData(); 
 
   } catch (error) {
     console.error("Error:", error.message);
-    alert("An error occurred while generating the link.");
+    // alert("An error occurred while generating the link.");
+    Swal.fire({
+  icon: "error",
+  title: "An error occurred while generating the link.",
+  text: "Please wait before trying again.",
+});
   } finally {
     setLoading(false);
   }
@@ -248,43 +352,27 @@ console.log("User Status:", { isSubscribed, plan });
 
 
 
+//  const supabase = createBrowserClient(
+//     process.env.NEXT_PUBLIC_SUPABASE_URL,
+//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+//   );
 
-function UpgradeButton({ userId, userEmail }) {
+   const handleSubscribe = async () => {
   
 
+    // رابط Lemon Squeezy الخاص بك
+    const baseUrl = "https://directly2004.lemonsqueezy.com/checkout/buy/201f7501-e446-46f4-8843-11df3bb73444";
+    
+    // إضافة البيانات المخصصة للرابط
+    const checkoutUrl = `${baseUrl}?checkout[custom][user_id]=${userId}&checkout[email]=${userEmail}&preview=1`;
 
-
-
-
-  if (typeof window !== 'undefined' && window.Paddle) {
-      window.Paddle.Initialize({ 
-        token: 'test_98ee8848025f8371d2bc08c1caa', // استبدله بـ Vendor ID الخاص بك
-        environment: 'sandbox' 
-      });
-      setPaddle(window.Paddle);
-    }
-  
-
-  const handleCheckout = () => {
-    if (!paddle) return;
-
-    paddle.Checkout.open({
-      items: [{
-        priceId: 'pro_01ke6yes6cqg1hyh24n3hffcqb', // الـ Price ID الخاص بك
-        quantity: 1
-      }],
-      customData: {
-        userId: userId // لربط الدفع بالمستخدم في Supabase
-      },
-      customer: {
-        email: userEmail
-      }
-    });
-handleCheckout()
-}
-}
-
-
+    // الانتقال لصفحة الدفع
+    window.open(
+      checkoutUrl,
+      '_blank',
+      'noopener,noreferrer'
+    )
+  };
 
 
 
@@ -308,7 +396,7 @@ handleCheckout()
         </button>
       )}
 
-      <aside className={`w-64 bg-white border-r border-slate-200 fixed md:relative h-full z-40 transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} flex flex-col`}>
+      <aside className={`w-64 pb-[20px] bg-white border-r border-slate-200 fixed md:relative h-full z-40 transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} flex flex-col`}>
         <div className="p-6 flex items-center justify-between text-indigo-600 font-bold text-2xl tracking-tight">
           <div className="flex items-center gap-2">
             <Zap className="fill-indigo-600" />
@@ -320,24 +408,52 @@ handleCheckout()
         </div>
 
         <nav className="flex-1 px-4 space-y-1 mt-4">
-          <NavItem icon={<LayoutGrid size={20} />} label="Dashboard" active />
-          <NavItem icon={<LinkIcon size={20} />} label="My Links" />
-          <NavItem icon={<BarChart3 size={20} />} label="Analytics" />
-          <NavItem icon={<Settings size={20} />} label="Settings" />
+          <NavItem icon={<LayoutGrid size={20} />} href="/dashboard" label="Dashboard" active />
+          <NavItem icon={<LinkIcon size={20} />} href="/links" label="My Links" />
+          {/* <NavItem icon={<BarChart3 size={20} />} label="Analytics" /> */}
+          <NavItem icon={<Settings size={20} />} href="/settings" label="Settings" />
         </nav>
 
-        <div className="p-4">
+    {!isSubscribed ?     <div className="p-4">
+  <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-4 text-white shadow-lg shadow-indigo-200">
+    <div className="flex justify-between mb-[11px] items-start">
+      <p className="text-xs opacity-80 font-medium italic">Pro Plan</p>
+      {/* أيقونة تاج صغيرة تعطي شعوراً بالتميز */}
+      <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full uppercase tracking-wider font-bold">Best Value</span>
+    </div>
+    
+    <p className="font-bold text-sm mb-3">Unlimited Deep Links</p>
+    
+    <button onClick={handleSubscribe} className="w-full bg-white text-indigo-600 py-2 rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors shadow-sm">
+      Upgrade for $4.5/mo
+    </button>
+
+    {/* قسم الأمان المضاف */}
+    <div className="mt-3 flex flex-col items-center justify-center gap-1.5 opacity-90">
+     
+      <p className="text-[12px] flex items-center gap-[5px] font-medium text-white/90">
+       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+        Secure SSL Payment
+      </p>
+        <p className="text-[12px] font-medium text-white/90">
+ Powered by Lemon Squeezy      </p>
+    </div>
+  </div>
+</div> : <div className="p-4">
           <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-4 text-white shadow-lg shadow-indigo-200">
-            <p className="text-xs opacity-80 mb-1 font-medium italic">Pro Access</p>
+            <p className="text-xs opacity-80 mb-1 font-medium italic">Pro Plan</p>
             <p className="font-bold text-sm mb-3">Unlimited Deep Links</p>
-            <button onClick={()=>UpgradeButton(userId,userEmail)} className="w-full bg-white text-indigo-600 py-2 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm">
-              Upgrade for $4/mo
-            </button>
+              <div className={`px-4 py-1.5 rounded-xl text-[11px] w-max font-black uppercase tracking-wider flex items-center gap-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100`}>
+                     <ShieldCheck size={17}/> Active
+                    
+                    </div>
           </div>
-        </div>
+        </div>}
         <button
   onClick={handleLogout}
-  className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-bold transition-all duration-200 border border-red-100"
+  className="flex items-center w-[90%] gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-bold transition-all duration-200 border mx-auto border-red-100"
 >
   <LogOut size={18} />
   Logout
@@ -348,29 +464,55 @@ handleCheckout()
       <main className="flex-1 flex flex-col overflow-hidden relative">
         
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
-          <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
+        <header className="h-16 bg-white border-b border-slate-200 max-md:justify-end flex items-center justify-between px-8">
+          {/* <h2 className='max-md:hidden flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-yellow-200 '>Welcome {userEmail.split("@")[0]}</h2> */}
+
+<h2 className="max-md:hidden flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all rounded-xl font-medium text-slate-700">
+  {/* أيقونة مستخدم صغيرة تعطي طابعاً احترافياً */}
+  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div> 
+  
+  <span className="text-slate-500 text-sm">Welcome,</span>
+  <span className="text-indigo-600 font-bold tracking-tight">
+    {userEmail.split("@")[0]}
+  </span>
+</h2>          {/* <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
             <span className="hidden sm:inline">Pages /</span> 
             <span className="text-slate-900 font-semibold italic underline decoration-indigo-300">Dashboard</span>
-          </div>
+          </div> */}
+          
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-slate-50 rounded-full transition text-slate-400">
-              <Plus size={22} />
-            </button>
-            <div className="w-9 h-9 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600 font-bold text-xs">JD</div>
+     {!isSubscribed ?  <button  onClick={handleSubscribe}  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg active:scale-95">
+      <Zap size={18} className="fill-current text-yellow-300" />
+      <span>Upgrade Now</span>
+    </button> :  <div className="flex items-center gap-2 mt-1">
+              <div className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></div>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+               PRO PLAN
+              </span>
+            </div>
+         }  
+            <div className="w-9 h-9 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600 font-bold text-[17px]">{userEmail ? userEmail[0].toUpperCase() : ''}</div>
           </div>
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-8 lg:p-12">
+        <div className="flex-1 overflow-y-auto p-8 lg:p-8">
           
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">Create a Deep Link 🚀</h1>
-            <p className="text-slate-500 text-lg">Instant app-opening links for your social media bio.</p>
+            <h1 className="text-4xl font-bold text-slate-900 leading-tight tracking-tight mb-4">Increase Your Conversions via deep link 🚀</h1>
+            <p className="text-slate-600 text-[18px] text-lg">
+              {isSubscribed ? 'Power up your conversions and reach with deep links that open instantly in any app. Create unlimited links—up to 9 new links every 24 hours maximum. ' : "Create smart deep links that drive higher conversions across Amazon, YouTube, Instagram, TikTok, and more. 🚀 Upgrade to PRO with secure payment for unlimited link creation! ⚡ Full control—cancel your subscription anytime from your settings. 🛡️"}
+            </p>
+            {!isSubscribed ? <p className='mt-[23px] lg:w-[77%] mx-auto bg-amber-200 text-[13px] font-semibold p-[10px] rounded-[5px] '>Free Plan: Create 1 smart deep link, valid for 24 hours only. Perfect for testing performance before upgrading to unlimited, permanent links.</p> 
+            :
+            <p className='mt-[23px] lg:w-[77%] mx-auto bg-amber-200 text-[15px] font-semibold p-[10px] rounded-[5px] '>PRO Plan: Unlimited permanent links  ( Daily creation limit: 9 links ). </p>
+            }
           </div>
 
           {/* Main Action Card */}
-          <div className="max-w-3xl mx-auto space-y-6">
+          <form onSubmit={(e)=>{
+            handleGenerate(e);
+          }} className="max-w-3xl mx-auto space-y-6">
             <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100">
               <div className="space-y-6">
                 <div>
@@ -379,6 +521,7 @@ handleCheckout()
                     <input 
                       type="text" 
                       value={url}
+                      required
                       onChange={(e) => setUrl(e.target.value)}
                       placeholder="Paste Amazon, YouTube, or Instagram link..."
                       className="w-full pl-5 pr-14 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-lg placeholder:text-slate-400 font-medium"
@@ -388,13 +531,73 @@ handleCheckout()
                     </div>
                   </div>
                 </div>
+                
 
-                <button 
+
+
+                <div className="space-y-2">
+  <label className="block text-sm font-bold text-slate-700 mb-3 ml-1 italic">
+    Custom Alias (Optional)
+  </label>
+  <div className="relative flex items-center">
+    <div className="absolute inset-y-0  pl-4 flex items-center pointer-events-none text-slate-400 text-sm font-bold">
+      {host}/go/
+    </div>
+    <input 
+      type="text"
+      value={customSlug}
+      // onChange={(e) => { setCustomSlug(e.target.value.toLowerCase().replace(/[\s#?]+/g, '-')); setSlugError(''); }}
+      onChange={(e) => {
+  const value = e.target.value.toLowerCase();
+  
+  // 1. استبدال المسافات والهاشتاج بشرطة
+  let cleanedValue = value.replace(/[\s#]+/g, '-');
+  
+  // 2. إزالة أي رمز ليس (حرف، رقم، شرطة، نقطة، شرطة سفلية)
+  // الرمز ^ داخل [] يعني "كل شيء ما عدا"
+  cleanedValue = cleanedValue.replace(/[^a-z0-9-._@]/g, '');
+
+  setCustomSlug(cleanedValue);
+  setSlugError('');
+}}
+      placeholder="my-awesome-link"
+      className={`w-full pl-[155px] pr-4 py-4 bg-slate-50 border ${slugError ? 'border-red-500' : 'border-slate-100'} rounded-2xl focus:ring-2 focus:ring-indigo-600 outline-none font-bold text-slate-700 transition-all`}
+    />
+  </div>
+  {slugError && <p className="text-red-500 text-[12px] font-bold ml-2">{slugError}</p>}
+</div>
+
+                {/* <button 
                   onClick={handleGenerate}
                   className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-2xl transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-3 text-lg"
                 >
                   Generate Smart Link <Zap size={20} className="fill-white" />
-                </button>
+                </button> */}
+                <button 
+  // onClick={handleGenerate}
+ 
+  disabled={isLimitReached || loading}
+  className={`w-full font-bold py-5 rounded-2xl transition-all flex items-center justify-center gap-3 text-lg shadow-lg 
+    ${isLimitReached 
+      ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none' // حالة تخطي الحد
+      : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200' // الحالة العادية
+    }`}
+>
+  {loading ? (
+    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+  ) : isLimitReached ? (
+    <>{isSubscribed ? 'Daily Limit Reached' : 'Free Plan Reached'} <ShieldAlert size={20} /></>
+  ) : (
+    <>Generate Smart Link <Zap size={20} className="fill-white" /></>
+  )}
+</button>
+
+{/* رسالة توضيحية تظهر فقط عند تخطي الحد */}
+{isLimitReached && (
+  <p className="text-center text-red-500 text-xs font-bold mt-4 animate-pulse">
+   {isSubscribed ? "You've reached your link creation limit for today. Please wait before creating more links." : "Free plan limit reached. Upgrade to Pro for unlimited Active links!"}
+  </p>
+)}
               </div>
             </div>
 
@@ -406,6 +609,7 @@ handleCheckout()
                   <span className="flex-1 font-semibold text-indigo-900 truncate">{generatedLink}</span>
                   <button 
                     onClick={copyToClipboard}
+                    type='button'
                     className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition"
                   >
                     {copied ? <Check size={18} /> : <Copy size={18} />}
@@ -414,10 +618,10 @@ handleCheckout()
                 </div>
               </div>
             )}
-          </div>
+          </form>
 
           <div className="max-w-3xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            <InfoCard color="amber" title="Pro Tip" desc="Deep links can increase conversion by 300% on TikTok." />
+            <InfoCard color="amber" title="Pro Tip" desc="Deep links can increase conversion by 300% on TikTok , Amazon ..." />
             <InfoCard color="indigo" title="Need Help?" desc="Contact our 24/7 support for enterprise solutions." />
           </div>
 
@@ -428,19 +632,22 @@ handleCheckout()
 };
 
 // --- Helper Components ---
-const NavItem = ({ icon, label, active = false }) => (
-  <a href={label == 'My Links' ? '/links' : '/dashboard'} className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${active ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'}`}>
+const NavItem = ({href, icon, label, active = false }) => (
+  <Link href={href} className={`flex items-center  gap-3 px-4 py-3 rounded-xl font-medium transition-all ${active ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'}`}>
     {icon} <span>{label}</span>
-  </a>
+  </Link>
 );
 
 const InfoCard = ({ color, title, desc }) => (
-  <div className={`flex gap-4 p-4 bg-${color}-50 rounded-2xl border border-${color}-100`}>
+  <div className={`flex gap-4 p-4 bg-${color}-50 rounded-2xl `}>
     <div className={`w-10 h-10 bg-${color}-100 rounded-xl flex items-center justify-center text-${color}-600 shrink-0 font-black italic`}>!</div>
     <div>
       <h4 className={`font-bold text-${color}-900 text-sm`}>{title}</h4>
-      <p className={`text-${color}-700 text-xs leading-relaxed mt-1`}>{desc}</p>
+      <p className={`text-${color}-700 text-xs leading-relaxed mt-1`}>{desc}     { title == "Need Help?" && <a className=' text-[12px] font-bold ' href="mailto:ay.bouguern@gmail.com">Email : ay.bouguern@gmail.com </a>}
+</p>
     </div>
+    <br/>
+
   </div>
 );
 

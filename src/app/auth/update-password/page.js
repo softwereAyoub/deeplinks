@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import Swal from 'sweetalert2';
 
 export default function UpdatePasswordPage() {
   const [newPassword, setNewPassword] = useState('');
@@ -17,7 +18,11 @@ useEffect(() => {
       setTimeout(async () => {
          const { data: { user: retryUser } } = await supabase.auth.getUser();
          if (retryUser) setHasSession(true);
-         else alert("Session not found. Please try requesting a new link.");
+         else    Swal.fire({
+              icon: "error",
+              title: 'Error',
+              text: "Session not found. Please try requesting a new link.",
+            })
       }, 1000);
     }
   };
@@ -33,9 +38,18 @@ useEffect(() => {
     });
 
     if (error) {
-      alert("Error: " + error.message);
+      // alert("Error: " + error.message);
+        Swal.fire({
+              icon: "error",
+              title: error.message,
+            });
     } else {
-      alert("Password updated! You can now login.");
+          Swal.fire({
+              title: "Good !",
+              text: "Password updated! You can now login.",
+              icon: "success"
+            });
+      // alert("Password updated! You can now login.");
       window.location.href = '/login';
     }
     setLoading(false);
