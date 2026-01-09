@@ -292,7 +292,6 @@ const isAndroid = /android/i.test(userAgent);
 const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
 
 let deepLink = originalUrl;
-setDeepLink(deepLink);
 setUrl(originalUrl);
 
 if (platform === 'youtube') {
@@ -309,6 +308,7 @@ if (platform === 'youtube') {
 
 // 3. محاولة الفتح التلقائي
 window.location.href = deepLink;
+setDeepLink(deepLink);
 
 // 4. بدلاً من الذهاب للمتصفح فوراً، ننتظر 2.5 ثانية
 // إذا لم يغادر المستخدم الصفحة (بسبب Alert إنستغرام أو Cancel)، نظهر الزر اليدوي
