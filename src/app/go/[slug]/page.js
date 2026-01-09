@@ -222,23 +222,60 @@ export default function RedirectPage({ params }) {
       }
 
       // 3. منطق التحويل (Deep Linking)
+      // const { original_url: originalUrl, platform } = linkData;
+      // let deepLink = originalUrl;
+
+      // const protocols = {
+      //   amazon: 'com.amazon.mobile.shopping://',
+      //   youtube: 'youtube://',
+      //   instagram: 'instagram://',
+      //   twitter: 'twitter://',
+      // };
+
+      // if (protocols[platform]) {
+      //   deepLink = originalUrl.replace(/https?:\/\//, protocols[platform]);
+      // } else if (platform === 'tiktok') {
+      //   deepLink = `snssdk1128://webview?url=${encodeURIComponent(originalUrl)}`;
+      // }
+
+
+      // window.location.replace(originalUrl);
+
+
+      // 3. منطق التحويل الاحترافي (Deep Linking Logic)
       const { original_url: originalUrl, platform } = linkData;
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const isAndroid = /android/i.test(userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+
       let deepLink = originalUrl;
 
-      const protocols = {
-        amazon: 'com.amazon.mobile.shopping://',
-        youtube: 'youtube://',
-        instagram: 'instagram://',
-        twitter: 'twitter://',
-      };
-
-      if (protocols[platform]) {
-        deepLink = originalUrl.replace(/https?:\/\//, protocols[platform]);
-      } else if (platform === 'tiktok') {
-        deepLink = `snssdk1128://webview?url=${encodeURIComponent(originalUrl)}`;
+      // تنسيق الروابط العميقة بناءً على المنصة ونظام التشغيل
+      if (platform === 'youtube') {
+        const videoId = originalUrl.split('v=')[1]?.split('&')[0] || originalUrl.split('/').pop();
+        deepLink = isIOS ? `youtube://www.youtube.com/watch?v=${videoId}` : `intent://www.youtube.com/watch?v=${videoId}#Intent;package=com.google.android.youtube;scheme=https;end`;
+      } 
+      else if (platform === 'amazon') {
+        // تحويل الرابط لصيغة تفهمها أمازون مباشرة
+        const cleanUrl = originalUrl.replace(/https?:\/\//, "");
+        deepLink = isIOS ? `com.amazon.mobile.shopping://www.${cleanUrl}` : `intent://${cleanUrl}#Intent;scheme=https;package=com.amazon.mp3;end`;
+      }
+      else if (platform === 'instagram') {
+        deepLink = `instagram://details?id=${originalUrl}`;
       }
 
-      window.location.replace(originalUrl);
+      // محاولة فتح التطبيق
+      if (deepLink !== originalUrl) {
+        window.location.href = deepLink;
+      }
+
+      // Fallback: إذا لم يفتح التطبيق خلال ثانية ونصف، افتح المتصفح العادي
+      const timeout = setTimeout(() => {
+        window.location.replace(originalUrl);
+      }, 1200);
+
+      // تنظيف التايم آوت في حال خرج المستخدم من المتصفح
+      window.onblur = () => clearTimeout(timeout);
 
       // setTimeout(() => {
       //   if (Date.now() - start < 2000) {
