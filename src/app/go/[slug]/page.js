@@ -162,6 +162,7 @@ export default function RedirectPage({ params }) {
   const unwrappedParams = use(params);
   const slug =  decodeURIComponent(unwrappedParams.slug);
 ;
+const [showManualButton, setShowManualButton] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [platforme, setPlatform] = useState(null);
 
@@ -277,33 +278,42 @@ export default function RedirectPage({ params }) {
 //       // تنظيف التايم آوت في حال خرج المستخدم من المتصفح
 //       window.onblur = () => clearTimeout(timeout);
 
+// 1. انتظر قليلاً لضمان ظهور التصميم الأنيق للمستخدم أولاً
 await new Promise(resolve => setTimeout(resolve, 800));
 
-    // 3. منطق التحويل (Deep Linking)
-    const { original_url: originalUrl, platform } = linkData;
-        setPlatform(platform);
+// 2. منطق التحويل (Deep Linking)
+const { original_url: originalUrl, platform } = linkData;
+setPlatform(platform); // لنعرف أي لوجو نظهر في الواجهة
 
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isAndroid = /android/i.test(userAgent);
+const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+const isAndroid = /android/i.test(userAgent);
+const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
 
-    let deepLink = originalUrl;
-    if (platform === 'youtube') {
-      const videoId = originalUrl.split('v=')[1]?.split('&')[0] || originalUrl.split('/').pop();
-      deepLink = isAndroid 
-        ? `intent://www.youtube.com/watch?v=${videoId}#Intent;package=com.google.android.youtube;scheme=https;end`
-        : `youtube://www.youtube.com/watch?v=${videoId}`;
-    }
-    // ... بقية المنصات
+let deepLink = originalUrl;
 
-    // 4. محاولة الفتح
-    window.location.href = deepLink;
+if (platform === 'youtube') {
+  const videoId = originalUrl.split('v=')[1]?.split('&')[0] || originalUrl.split('/').pop();
+  deepLink = isAndroid 
+    ? `intent://www.youtube.com/watch?v=${videoId}#Intent;package=com.google.android.youtube;scheme=https;end`
+    : `youtube://www.youtube.com/watch?v=${videoId}`;
+} else if (platform === 'amazon') {
+  const cleanUrl = originalUrl.replace(/https?:\/\//, "");
+  deepLink = isIOS 
+    ? `com.amazon.mobile.shopping://www.${cleanUrl}` 
+    : `intent://${cleanUrl}#Intent;scheme=https;package=com.amazon.mp3;end`;
+}
 
-    // Fallback للمتصفح العادي
-    const timeout = setTimeout(() => {
-      window.location.replace(originalUrl);
-    }, 1500);
+// 3. محاولة الفتح التلقائي
+window.location.href = deepLink;
 
-    window.onblur = () => clearTimeout(timeout);
+// 4. بدلاً من الذهاب للمتصفح فوراً، ننتظر 2.5 ثانية
+// إذا لم يغادر المستخدم الصفحة (بسبب Alert إنستغرام أو Cancel)، نظهر الزر اليدوي
+const timeout = setTimeout(() => {
+  setShowManualButton(true); // تأكد من تعريف هذه الحالة بـ useState(false)
+}, 2500);
+
+// إذا نجح التحويل وخرج المستخدم من المتصفح، نلغي التايم آوت
+window.onblur = () => clearTimeout(timeout);
 
       // setTimeout(() => {
       //   if (Date.now() - start < 2000) {
@@ -355,49 +365,64 @@ await new Promise(resolve => setTimeout(resolve, 800));
   //     {/* <h2 className="mt-6 text-xl font-bold text-slate-800">Opening ...</h2> */}
   //   </div>
   // );
-  return (
-  <div className="flex flex-col items-center justify-center h-screen bg-slate-50">
-    {/* بطاقة مركزية لإعطاء شعور بالرسمية */}
-    <div className="flex flex-col items-center max-w-sm w-full px-6 py-12 bg-white rounded-[2.5rem] shadow-sm border border-slate-100">
+return (
+  <div className="flex flex-col items-center justify-center h-screen bg-slate-50 p-4">
+    <div className="flex flex-col items-center max-w-sm w-full px-6 py-10 bg-white rounded-[2.5rem] shadow-sm border border-slate-100">
       
-      {/* أيقونة التطبيق المستهدف (الديناميكية) */}
+      {/* أيقونة المنصة مع Spinner */}
       <div className="relative mb-8">
         <div className="h-20 w-20 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 overflow-hidden shadow-inner">
-          {platforme === 'amazon' && (
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" className="w-12 h-12" alt="Amazon" />
-          )}
-          {platforme === 'youtube' && (
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" className="w-12 h-12" alt="YouTube" />
-          )}
-          {!['amazon', 'youtube'].includes(platforme) && (
-             <div className="h-10 w-10 bg-indigo-100 rounded-full animate-pulse" />
+          {platform === 'amazon' ? (
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" className="w-12 h-12" />
+          ) : platform === 'youtube' ? (
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" className="w-12 h-12" />
+          ) : (
+            <div className="h-10 w-10 bg-indigo-100 rounded-full animate-pulse" />
           )}
         </div>
-        {/* Spinner صغير يدور حول الأيقونة */}
-        <div className="absolute -inset-2 border-2 border-transparent border-t-indigo-500 rounded-full animate-spin"></div>
+        {!showManualButton && (
+          <div className="absolute -inset-2 border-2 border-transparent border-t-indigo-500 rounded-full animate-spin"></div>
+        )}
       </div>
 
-      {/* نصوص التوجيه */}
       <h2 className="text-xl font-bold text-slate-800 mb-2">
-        Opening Official App
+        {showManualButton ? "Action Required" : "Opening Official App"}
       </h2>
-      <p className="text-slate-500 text-center text-sm leading-relaxed mb-6">
-        Connecting you safely to <br />
-        <span className="font-semibold text-slate-700">{platforme || 'the destination'}</span>
+      
+      <p className="text-slate-500 text-center text-sm mb-8">
+        {showManualButton 
+          ? "If the app didn't open automatically, please use the button below."
+          : `Connecting you safely to ${platform || 'the app'}...`}
       </p>
 
-      {/* شريط تقدم بسيط (Progress Bar) لإعطاء إيحاء بالسرعة */}
-      <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div className="h-full bg-indigo-600 animate-[loading_1.5s_ease-in-out_infinite] w-1/2 rounded-full"></div>
-      </div>
+      {/* التبديل بين شريط التحميل والزر اليدوي */}
+      {showManualButton ? (
+        <div className="w-full space-y-4">
+          <button 
+            onClick={() => window.location.href = deepLink}
+            className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 active:scale-95 transition-transform"
+          >
+            Open in App
+          </button>
+          
+          <button 
+            onClick={() => window.location.replace(originalUrl)}
+            className="w-full py-3 text-slate-400 text-sm font-medium"
+          >
+            Continue in Browser
+          </button>
+        </div>
+      ) : (
+        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-full bg-indigo-600 animate-[loading_1.5s_ease-in-out_infinite] w-1/2 rounded-full"></div>
+        </div>
+      )}
 
-      {/* ملاحظة صغيرة لتهيئة المستخدم للتنبيه (The Alert) */}
-      <p className="mt-8 text-[11px] text-slate-400 uppercase tracking-widest font-medium">
-        Secure Redirect by YourBrand
+      <p className="mt-8 text-[10px] text-slate-300 uppercase tracking-widest font-bold">
+        Secure Redirect
       </p>
     </div>
 
-    {/* ستايل الأنميشن للشريط */}
     <style jsx>{`
       @keyframes loading {
         0% { transform: translateX(-100%); }
