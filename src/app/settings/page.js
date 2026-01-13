@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import Link from 'next/link';
 import { ArrowBigLeft } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState(null);
