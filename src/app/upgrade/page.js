@@ -163,6 +163,8 @@ export default function UpgradePage() {
   );
 
   useEffect(() => {
+      document.title = "Upgrade";
+
     async function getUserData() {
       try {
         // 1. الحصول على المستخدم من الجلسة

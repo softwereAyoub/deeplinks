@@ -1,7 +1,12 @@
-import { Mail, Zap, ShieldCheck } from "lucide-react";
+'use client';
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function TermsOfService() {
+  useEffect(()=>{
+  document.title = "Terms of Service";
+  
+    },[])
   return (
     <div className="min-h-screen bg-[#f8fafc] py-20 px-6 font-sans dark:bg-slate-950">
       <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-8 md:p-16 rounded-[2.5rem] shadow-2xl shadow-slate-200 dark:shadow-none border border-slate-100 dark:border-slate-800">

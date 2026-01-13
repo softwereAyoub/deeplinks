@@ -624,6 +624,7 @@ export default function Dashboard() {
   const [editingLinkId, setEditingLinkId] = useState(null);
 const [isUpdating, setIsUpdating] = useState(false);
   useEffect(() => {
+    document.title = "Links";
     fetchDashboardData();
   }, []);
 

@@ -9,13 +9,14 @@ import Swal from 'sweetalert2';
 export default function SettingsPage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
 
   useEffect(() => {
+    document.title = "Settings";
+
     async function getProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -96,7 +97,7 @@ const handleCancel = async () => {
   if (loading) return <div className="p-10 text-center">Loading...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+    <div className="max-w-2xl mx-auto mt-14 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
             <Link href='/dashboard' className="p-2 absolute left-[65px] top-[35px]  inline-flex bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 hover:scale-105 transition-transform">
             <ArrowBigLeft size={24} />
           </Link>
@@ -141,17 +142,22 @@ const handleCancel = async () => {
               // onClick={() => window.open('https://www.paypal.com/myaccount/autopay/', '_blank')}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex cursor-pointer items-center justify-center w-full px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-semibold"
+              className="inline-flex cursor-pointer items-center justify-center w-full px-4 py-2 bg-red-50 border border-red-200 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-semibold"
             >
-               Cancel Subscription from PayPal
+               Cancel Subscription from Your PayPal
             </a>
             <button 
   onClick={handleCancel}
-  className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+              className="inline-flex cursor-pointer items-center justify-center w-full px-4 py-2 bg-red-500 border mt-[10px] border-red-200 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
 >
   Cancel Subscription Directly
 </button>
           </div>
+            <p className="mt-3 text-center text-[15px]  text-gray-700">
+If you encounter any problem, you can contact us via    <a href="mailto:support@yourdomain.com" className="text-indigo-600 font-bold ml-1 hover:underline">
+      direopsupp@gmail.com
+    </a>. We will process your request within 12-24 hours.
+  </p>
         </div>
       ) : (
         /* Free User UI */

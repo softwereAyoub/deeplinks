@@ -5,9 +5,9 @@ import {
   Zap, 
   LayoutGrid, 
   Link as LinkIcon, 
-  BarChart3, 
+
   Settings, 
-  Plus, 
+ 
   Copy,
   Check,
   Smartphone,
@@ -28,7 +28,9 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 
 
+
 const Dashboard = () => {
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [url, setUrl] = useState('');
   const [platform, setPlatform] = useState('web'); // amazon, youtube, instagram, web
@@ -118,6 +120,8 @@ if(profile.is_subscribed === true  && expiryDate > now){
 
 }
 useEffect(() => {
+      document.title = "Dashboard";
+
 fetchDataUser()
   setHost(window.location.host);
 
@@ -242,7 +246,7 @@ if (count > 10) { // حد أقصى 10 رابط في الساعة للمجاني
   return      Swal.fire({
   icon: "error",
   title: "⚠️ Rate Limit Exceeded",
-  text: "You can create up to 10 links per 20 hours. Please wait before creating more.",
+  text: "You can create up to 10 links per 24 hours. Please wait before creating more.",
 });
   // alert("⚠️ Rate Limit Exceeded: You can create up to 10 links per 20 hours. Please wait before creating more.");
    
@@ -482,7 +486,7 @@ console.log("User Status:", { isSubscribed, plan });
         Secure SSL Payment
       </p>
         <p className="text-[12px] font-medium text-white/90">
- Powered by Lemon Squeezy      </p>
+ Powered by PayPal      </p>
     </div>
   </div>
 </div> : <div className="p-4">

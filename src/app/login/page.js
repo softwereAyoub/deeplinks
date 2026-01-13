@@ -28,6 +28,8 @@ function LoginPage2() {
 
  // 'asc'
 useEffect(()=>{
+    document.title = (isSignUp ? "Sign Up" : "Sign In");
+
  const sort = searchParams.get('signup');
  if(sort === 'true'){
   setIsSignUp(true);
