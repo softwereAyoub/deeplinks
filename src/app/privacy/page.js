@@ -1,115 +1,107 @@
-import { Mail, Zap } from "lucide-react";
+import { Mail, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
 
-
-export default function LegalPage() {
+export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-[#f0f7ff] pt-20 px-6">
-      <div className="max-w-3xl mx-auto bg-white p-8 md:p-16 rounded-[2.5rem] shadow-xl shadow-blue-100 border border-blue-50">
+    <div className="min-h-screen bg-[#f8fafc] pt-20 px-6 dark:bg-slate-950">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-8 md:p-16 rounded-[2.5rem] shadow-2xl shadow-slate-200 dark:shadow-none border border-slate-100 dark:border-slate-800">
         
         {/* Header Section */}
-        <div className="border-b border-blue-50 pb-8 mb-10 text-center md:text-left">
-          <h1 className="text-4xl font-black text-blue-950 mb-4 tracking-tight">Privacy Policy</h1>
-          <p className="text-blue-500 font-bold text-sm uppercase tracking-widest">
-            Last Updated: January 8, 2026
+        <div className="border-b border-slate-100 dark:border-slate-800 pb-8 mb-10 text-center md:text-left">
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Privacy Policy</h1>
+          <p className="text-indigo-600 dark:text-indigo-400 font-bold text-sm uppercase tracking-widest">
+            Last Updated: January 11, 2026
           </p>
         </div>
 
         {/* Content Section */}
-        <div className="space-y-10 text-blue-900/80 leading-relaxed">
+        <div className="space-y-10 text-slate-600 dark:text-slate-400 leading-relaxed text-sm md:text-base">
           
           <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
               1. Introduction
             </h2>
             <p>
-              Welcome to <strong>DeepLinker</strong>. Your privacy is paramount to us. This Privacy Policy outlines how we collect, use, and safeguard your personal information when you use our SaaS platform to create and manage deep links.
+              Welcome to <strong>Direop</strong>. We respect your privacy and are committed to protecting your personal data. This policy explains how we handle your information when you use our dynamic link management services.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-              2. Information We Collect
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+              2. Data We Collect
             </h2>
             <ul className="list-disc pl-5 space-y-3">
-              <li><strong>Account Information:</strong> When you register via Supabase Auth, we securely store your email address to identify your account and provide access to your dashboard.</li>
-              <li><strong>Usage Analytics:</strong> We collect non-identifiable data regarding clicks on your generated links (e.g., total clicks, device types, and geographic regions) to provide you with marketing insights.</li>
+              <li><strong>Account Credentials:</strong> We use <strong>Supabase Auth</strong> to manage your login. We only store your email address to identify your dashboard and subscription status.</li>
+              <li><strong>Link Analytics:</strong> We track non-personal data such as click counts, general geographic location (country level), and device types to provide you with performance insights.</li>
+              <li><strong>Cookies:</strong> We use essential cookies to keep you logged into your session.</li>
             </ul>
           </section>
 
+       <section>
+  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+    <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+    3. Payment Integrity
+  </h2>
+  <p className="text-slate-700 dark:text-slate-300">
+    All financial transactions are securely processed through <strong>PayPal</strong>. We do not store, see, or have access to your credit card details or bank information. 
+  </p>
+  <p className="mt-3 text-slate-700 dark:text-slate-300">
+    PayPal provides us only with the necessary confirmation to activate your subscription status. You can review their security and privacy standards at <a href="https://www.paypal.com/webapps/mpp/ua/privacy-full" className="text-indigo-600 underline font-medium" target="_blank" rel="noopener noreferrer">PayPal Privacy Policy</a>.
+  </p>
+</section>
+
           <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-              3. Payment Processing
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+              4. Data Infrastructure
             </h2>
             <p>
-              All financial transactions are handled by <strong>Lemon Squeezy</strong>, our Merchant of Record. DeepLinker does not store, process, or have access to your credit card details or billing information. Please refer to <a href="https://www.lemonsqueezy.com/privacy" className="text-blue-600 underline font-medium">Lemon Squeezy’s Privacy Policy</a> for more details.
+              Our database is powered by <strong>Supabase</strong>, ensuring industry-standard encryption for your data at rest and in transit. We never sell your data to third-party advertisers. We only share data with essential infrastructure providers (Supabase, Lemon Squeezy) to maintain your service.
             </p>
           </section>
 
-          <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-              4. Data Security & Third Parties
-            </h2>
-            <p>
-              We utilize <strong>Supabase</strong> for secure database management. We do not sell, trade, or otherwise transfer your personal information to outside parties. Data is only shared with these essential third-party services to ensure the functionality of our platform.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-              5. User Rights & Deletion
-            </h2>
-            <p>
-              You maintain full control over your data. You may request the deletion of your account and all associated link data directly through your dashboard or by contacting our support team.
-            </p>
-          </section>
+         <section>
+  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+    <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+    5. Your Rights & Data Management
+  </h2>
+  <p>
+    You have the right to access and manage your active links through your dashboard. In this current version (MVP), to ensure data integrity and prevent accidental loss, account deletion or permanent link removal is handled manually by our team.
+  </p>
+  <p className="mt-3">
+    If you wish to delete your account or specific data, please contact us at 
+    <a href="mailto:support@yourdomain.com" className="text-indigo-600 font-bold ml-1 hover:underline">
+      direopsupp@gmail.com
+    </a>. We will process your request within 24-48 hours.
+  </p>
+</section>
 
           {/* Contact Footer */}
-          <div className="mt-16 pt-8 border-t border-blue-50 text-center">
-            <p className="text-sm font-medium text-blue-400">
-              Questions about our policy? Contact us at
+          <div className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
+            <p className="text-sm font-medium text-slate-400">
+              For privacy concerns or data requests:
             </p>
-            <a href="mailto:support@deeplinker.com" className="text-blue-600 font-bold hover:underline">
-              support@deeplinker.com
+            <a href="mailto:support@yourdomain.com" className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+              support@yourdomain.com
             </a>
           </div>
 
         </div>
       </div>
-        {/* --- Footer (Crucial for Legal/Lemon Squeezy) --- */}
-      <footer className="bg-slate-50 mt-[27px] border-t border-slate-100 pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-16">
-          <div className="col-span-2 space-y-4">
-            <div className="flex items-center gap-2">
-              <Zap size={24} className="text-indigo-600 fill-indigo-600" />
-              <span className="text-xl font-bold tracking-tight">DeepLinker</span>
-            </div>
-            <p className="text-slate-400 max-w-sm text-sm">Helping content creators bridge the gap between social media and native applications since 2024.</p>
+
+      {/* Footer Section */}
+        <footer className="mt-20 border-t border-slate-200 dark:border-slate-800 pt-12 pb-8">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="flex justify-center gap-6 mb-4 text-sm font-semibold text-slate-500">
+            <Link href="/privacy" className="hover:text-indigo-600">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-indigo-600">Terms of Service</Link>
+            <Link href="/refunds" className="hover:text-indigo-600">Refund Policy</Link>
           </div>
-          <div>
-            <h4 className="font-bold mb-4 text-sm uppercase tracking-widest text-slate-900">Legal</h4>
-            <ul className="space-y-2 text-sm text-slate-500 font-medium">
-              <li><Link href="/terms" className="hover:text-indigo-600 transition-colors text-slate-400">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="hover:text-indigo-600 transition-colors text-slate-400">Privacy Policy</Link></li>
-              <li><Link href="/refunds" className="hover:text-indigo-600 transition-colors text-slate-400">Refund Policy</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4 text-sm uppercase tracking-widest text-slate-900">Contact</h4>
-            <ul className="space-y-2 text-sm text-slate-500 font-medium">
-              <li><a href="mailto:support@deeplinker.com" className="hover:text-indigo-600 flex items-center gap-2 text-slate-400">
-                <Mail size={16} /> support@deeplinker.com
-              </a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 text-center border-t border-slate-200/50 pt-8 text-slate-400 text-xs font-medium">
-          © 2026 DeepLinker. All rights reserved.
+          <p className="text-slate-400 text-xs uppercase tracking-widest font-bold">
+            © 2026 Direop. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

@@ -1,120 +1,106 @@
-import { Mail, Zap } from "lucide-react";
+import { Mail, Zap, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 
 export default function RefundPolicy() {
   return (
-    <div className="min-h-screen bg-[#f0f7ff] py-20 px-6 font-sans">
-      <div className="max-w-3xl mx-auto bg-white p-8 md:p-16 rounded-[2.5rem] shadow-xl shadow-blue-100 border border-blue-50">
+    <div className="min-h-screen bg-[#f8fafc] py-20 px-6 font-sans dark:bg-slate-950">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-8 md:p-16 rounded-[2.5rem] shadow-2xl shadow-slate-200 dark:shadow-none border border-slate-100 dark:border-slate-800">
         
         {/* Header Section */}
-        <div className="border-b border-blue-50 pb-8 mb-10 text-center md:text-left">
-          <h1 className="text-4xl font-black text-blue-950 mb-4 tracking-tight">Refund Policy</h1>
-          <p className="text-blue-500 font-bold text-sm uppercase tracking-widest">
-            Last Updated: January 8, 2026
+        <div className="border-b border-slate-100 dark:border-slate-800 pb-8 mb-10 text-center md:text-left">
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Refund Policy</h1>
+          <p className="text-indigo-600 dark:text-indigo-400 font-bold text-sm uppercase tracking-widest">
+            Effective Date: January 11, 2026
           </p>
         </div>
 
         {/* Content Section */}
-        <div className="space-y-10 text-blue-900/80 leading-relaxed text-sm md:text-base">
+        <div className="space-y-10 text-slate-600 dark:text-slate-400 leading-relaxed text-sm md:text-base">
           
           <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-              1. Our "Try Before You Buy" Philosophy
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+              1. "Try Before You Buy" Philosophy
             </h2>
             <p>
-              At <strong>DeepLinker</strong>, we believe in transparency. We provide a robust <strong>Free Tier</strong> that allows you to experience our core technology before deciding to upgrade to a Pro subscription. We strongly encourage all users to utilize this free version to ensure our service meets their specific needs.
+              At <strong>Direop</strong>, we offer a <strong>Free Tier</strong> to allow users to fully test our link management and redirection technology before committing to a paid plan. We strongly encourage all users to utilize this free access to ensure the service meets their automation needs.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-              2. Eligibility for Refunds
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+              2. Refund Eligibility
             </h2>
             <p>
-              Since we offer a free version for evaluation, refunds are generally not issued for "change of mind" or "mistake in purchase." However, your satisfaction is important. We will honor refund requests in the following case:
+              Due to the digital nature of our service and the availability of a free version, paid subscriptions are generally <strong>non-refundable</strong> for "change of mind" or "under-utilization" of the service. However, we may issue a refund in the following circumstance:
             </p>
             <ul className="list-disc pl-5 mt-3 space-y-2">
-              <li><strong>Technical Failures:</strong> If you encounter a verified technical bug or a core service failure that prevents the service from working as advertised, and our team is unable to resolve it within 7 business days.</li>
+              <li><strong>Critical Technical Failures:</strong> If a verified system bug or core service failure prevents you from using the platform as advertised, and our technical team is unable to resolve the issue within 7 business days of being notified.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
               3. Refund Request Process
             </h2>
             <p>
-              To request a refund under the technical failure condition, please email us at <strong>support@deeplinker.com</strong> within 7 days of the initial transaction. You must include:
+              To request a refund under the technical failure condition, please contact us at <strong>support@yourdomain.com</strong> within 7 days of the transaction. Please include:
             </p>
-            <ul className="list-disc pl-5 mt-3 space-y-2 border-l-2 border-blue-100 ml-2">
+            <ul className="list-disc pl-5 mt-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 ml-2 py-1">
               <li>Your order number from Lemon Squeezy.</li>
-              <li>A description or screenshot of the technical error encountered.</li>
+              <li>A detailed description or screenshot of the technical error.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
               4. Subscription Cancellations
             </h2>
             <p>
-              You can cancel your monthly subscription at any time through your dashboard. Upon cancellation, you will retain access to all Pro features until the end of your current billing cycle. No further charges will be made.
+              You can cancel your subscription at any time via your dashboard settings. Upon cancellation, you will retain access to Pro features until the end of your current billing period. No further charges will be applied to your account.
             </p>
           </section>
 
-          <section>
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-              5. Processing of Refunds
-            </h2>
-            <p>
-              Approved refunds will be processed via <strong>Lemon Squeezy</strong> and returned to the original payment method. Depending on your bank, it may take 5-10 business days for the funds to appear in your account.
-            </p>
-          </section>
+    <section>
+  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+    <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+    5. Processing Refunds
+  </h2>
+  <p className="text-slate-700 dark:text-slate-300">
+    Because we provide a <strong>free trial (3 links for 48 hours each)</strong> to let you test the service before upgrading, we generally do not offer refunds once a premium subscription is purchased.
+  </p>
+  <p className="mt-3 text-slate-700 dark:text-slate-300">
+    In cases of billing errors or technical issues, approved refunds will be issued via <strong>PayPal</strong> to your original payment method. Please allow <strong>5-10 business days</strong> for the transaction to be completed.
+  </p>
+</section>
 
           {/* Contact Footer */}
-          <div className="mt-16 pt-8 border-t border-blue-50 text-center">
-            <p className="text-sm font-medium text-blue-400">
-              Need help with a payment issue?
+          <div className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
+            <p className="text-sm font-medium text-slate-400">
+              Need assistance with your billing?
             </p>
-            <a href="mailto:support@deeplinker.com" className="text-blue-600 font-bold hover:underline">
-              support@deeplinker.com
+            <a href="mailto:support@yourdomain.com" className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+              direopsupp@gmail.com
             </a>
           </div>
 
         </div>
       </div>
-             {/* --- Footer (Crucial for Legal/Lemon Squeezy) --- */}
-      <footer className="bg-slate-50 mt-[27px] border-t border-slate-100 pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-16">
-          <div className="col-span-2 space-y-4">
-            <div className="flex items-center gap-2">
-              <Zap size={24} className="text-indigo-600 fill-indigo-600" />
-              <span className="text-xl font-bold tracking-tight">DeepLinker</span>
-            </div>
-            <p className="text-slate-400 max-w-sm text-sm">Helping content creators bridge the gap between social media and native applications since 2024.</p>
+
+      {/* Footer (Consistency with other legal pages) */}
+      <footer className="mt-20 border-t border-slate-200 dark:border-slate-800 pt-12 pb-8">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="flex justify-center gap-6 mb-4 text-sm font-semibold text-slate-500">
+            <Link href="/privacy" className="hover:text-indigo-600">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-indigo-600">Terms of Service</Link>
+            <Link href="/refunds" className="hover:text-indigo-600">Refund Policy</Link>
           </div>
-          <div>
-            <h4 className="font-bold mb-4 text-sm uppercase tracking-widest text-slate-900">Legal</h4>
-            <ul className="space-y-2 text-sm text-slate-500 font-medium">
-              <li><Link href="/terms" className="hover:text-indigo-600 transition-colors text-slate-400">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="hover:text-indigo-600 transition-colors text-slate-400">Privacy Policy</Link></li>
-              <li><Link href="/refunds" className="hover:text-indigo-600 transition-colors text-slate-400">Refund Policy</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold mb-4 text-sm uppercase tracking-widest text-slate-900">Contact</h4>
-            <ul className="space-y-2 text-sm text-slate-500 font-medium">
-              <li><a href="mailto:support@deeplinker.com" className="hover:text-indigo-600 flex items-center gap-2 text-slate-400">
-                <Mail size={16} /> support@deeplinker.com
-              </a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 text-center border-t border-slate-200/50 pt-8 text-slate-400 text-xs font-medium">
-          © 2026 DeepLinker. All rights reserved.
+          <p className="text-slate-400 text-xs uppercase tracking-widest font-bold">
+            © 2026 Direop. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

@@ -18,13 +18,14 @@ import {
   Music2,
   LogOut,
   ShieldAlert,
-  ShieldCheck
+  ShieldCheck,
+  
 } from 'lucide-react';
 import { Menu, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
-
+import { useRouter } from 'next/navigation';
 
 
 const Dashboard = () => {
@@ -40,7 +41,10 @@ const [isSubscribed, setSubs] = useState(true);
 const [customSlug, setCustomSlug] = useState('');
 const [slugError, setSlugError] = useState('');
 const [host, setHost] = useState('');
-
+const [Subs, setHandleSubs] = useState(false);
+const [subscriptionPlan, setSubscriptionPlan] = useState(null);
+const [subscriptionEndsAt, setSubscriptionEndsAt] = useState(null);
+const router = useRouter();
 const [isLimitReached, setIsLimitReached] = useState(false);
 const copyToClipboard = async () => {
   if (!generatedLink) return;
@@ -76,12 +80,16 @@ const fetchDataUser = async () => {
 
     const { data: profile, error: profileError } = await supabase
   .from('profiles')
-  .select('is_subscribed, subscription_plan')
+  .select('is_subscribed, subscription_plan, subscription_ends_at')
   .eq('id', user.id)
   .maybeSingle(); 
+  const now = new Date();
+  const expiryDate = new Date(profile.subscription_ends_at);
     // const isPro = profile.is_subscribed === true;
-    setSubs(profile.is_subscribed === true);
-if(profile.is_subscribed === true){
+    setSubs(profile.is_subscribed === true && expiryDate > now );
+    setSubscriptionPlan(profile.subscription_plan);
+    setSubscriptionEndsAt(profile.subscription_ends_at);
+if(profile.is_subscribed === true  && expiryDate > now){
       const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -119,16 +127,20 @@ fetchDataUser()
 const checkUserSubscription = async () => {
    const { data: profile, error: profileError } = await supabase
   .from('profiles')
-  .select('is_subscribed, subscription_plan')
+  .select('is_subscribed, subscription_plan, subscription_ends_at')
   .eq('id', userId)
   .maybeSingle(); 
     // const isPro = profile.is_subscribed === true;
-    setSubs(profile.is_subscribed === true);
-    if(profile.is_subscribed === true && isLimitReached  ){
+      const now = new Date();
+  const expiryDate = new Date(profile.subscription_ends_at);
+    setSubs(profile.is_subscribed === true && expiryDate > now );
+      setSubscriptionPlan(profile.subscription_plan);
+    setSubscriptionEndsAt(profile.subscription_ends_at);
+    if(profile.is_subscribed === true &&  expiryDate > now &&  isLimitReached  ){
       setIsLimitReached(false);
             console.log("testtttttttttttttttttttttt");
 
-    }
+    } 
 }
 
 useEffect(() => {
@@ -226,7 +238,7 @@ const { count, error } = await supabase
   .eq('user_id', user.id)
   .gt('created_at', new Date(Date.now() - (20 * 60 * 60 * 1000)).toISOString()); // آخر ساعة
 
-if (count > 9) { // حد أقصى 10 رابط في الساعة للمجاني
+if (count > 10) { // حد أقصى 10 رابط في الساعة للمجاني
   return      Swal.fire({
   icon: "error",
   title: "⚠️ Rate Limit Exceeded",
@@ -266,13 +278,13 @@ console.log("User Status:", { isSubscribed, plan });
     const isPro = profile.is_subscribed === true;
     setSubs(isPro);
     // إذا لم يكن مشتركاً وحاول إنشاء أكثر من رابط واحد
-    if (!isPro && linksCount >= 1) {
+    if (!isPro && linksCount >= 3) {
 
       // alert("⚠️ Free Plan Limit: You can only create 1 link. Please upgrade to Pro for unlimited access!");
       Swal.fire({
   icon: "error",
   title: "⚠️ Free Plan Limit",
-  text: "You can only create 1 link. Please upgrade to Pro for unlimited access!",
+  text: "You can only create 3 link. Please upgrade to Pro for unlimited access!",
 });
           setIsLimitReached(true);
 
@@ -285,7 +297,7 @@ console.log("User Status:", { isSubscribed, plan });
     // 6. تحديد تاريخ الانتهاء (إذا كان مجاني ينتهي بعد 24 ساعة)
     // ملاحظة: يجب أن تضيف عمود expires_at في جدول links في سوبابيس إذا أردت تفعيل ميزة الـ 24 ساعة
     const expiresAt = !isPro 
-      ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() 
+      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() 
       : null;
 
     // 7. إدخال الرابط في قاعدة البيانات
@@ -315,7 +327,7 @@ console.log("User Status:", { isSubscribed, plan });
 })
  : 
    Swal.fire({
-  title: "Temporary link generated (Valid for 24h)",
+  title: "Temporary link generated (Valid for 48h)",
   icon: "success"
 })
  
@@ -360,18 +372,17 @@ console.log("User Status:", { isSubscribed, plan });
    const handleSubscribe = async () => {
   
 
-    // رابط Lemon Squeezy الخاص بك
-    const baseUrl = "https://directly2004.lemonsqueezy.com/checkout/buy/201f7501-e446-46f4-8843-11df3bb73444";
+    // // رابط Lemon Squeezy الخاص بك
+    // const baseUrl = "https://directly2004.lemonsqueezy.com/checkout/buy/201f7501-e446-46f4-8843-11df3bb73444";
     
-    // إضافة البيانات المخصصة للرابط
-    const checkoutUrl = `${baseUrl}?checkout[custom][user_id]=${userId}&checkout[email]=${userEmail}&preview=1`;
+    // // إضافة البيانات المخصصة للرابط
+    // const checkoutUrl = `${baseUrl}?checkout[custom][user_id]=${userId}&checkout[email]=${userEmail}&preview=1`;
 
-    // الانتقال لصفحة الدفع
-    window.open(
-      checkoutUrl,
-      '_blank',
-      'noopener,noreferrer'
-    )
+    // // الانتقال لصفحة الدفع
+  router.push('/upgrade')
+    // setHandleSubs(true);
+    
+    
   };
 
 
@@ -384,7 +395,39 @@ console.log("User Status:", { isSubscribed, plan });
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-slate-900 font-sans overflow-hidden">
-      
+{/* {Subs && <div className=' absolute left-[46%] bg-white  rounded-[8px] max-md:left-[20%] top-[40%]  p-[45px] z-[10] '> 
+  < X size={30} onClick={()=> setHandleSubs(false)} className=' absolute top-[10px] bg-gray-300 p-[5px] rounded-full cursor-pointer right-[15px] '/>
+       <PayPalScriptProvider options={{ 
+      "client-id": "ARGPHh-iy1nZ_KusDoY2BOt65fMFQJrr84apNWJFi-9tcWTFa8PNfNhhKjsxu1KSw71NYfIkH-h0kKew", // هذا الـ Client ID الخاص بك
+      vault: true, 
+      intent: "subscription" 
+    }}>
+      <PayPalButtons
+        style={{ shape: 'rect', color: 'gold', layout: 'vertical', label: 'subscribe' }}
+        createSubscription={(data, actions) => {
+          return actions.subscription.create({
+            plan_id: 'P-0PN22317719958939NFSLTTA' // تأكد من وضع الـ Plan ID الحقيقي هنا
+          });
+        }}
+        onApprove={async (data, actions) => {
+          // بدلاً من تحديث Supabase هنا، نرسل البيانات للـ API الخاص بنا
+          const response = await fetch('/api/paypal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              subscriptionID: data.subscriptionID,
+              userId: userId,
+              userEmail: userEmail
+            }),
+          });
+
+          if (response.ok) {
+            alert("Success! You are now a PRO member.");
+            window.location.reload(); 
+          }
+        }}
+      />
+    </PayPalScriptProvider></div>} */}
       {/* --- Sidebar --- */}
       {/* Burger Menu Button (Mobile) */}
       {!sidebarOpen && (
@@ -396,12 +439,13 @@ console.log("User Status:", { isSubscribed, plan });
         </button>
       )}
 
+
       <aside className={`w-64 pb-[20px] bg-white border-r border-slate-200 fixed md:relative h-full z-40 transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} flex flex-col`}>
         <div className="p-6 flex items-center justify-between text-indigo-600 font-bold text-2xl tracking-tight">
           <div className="flex items-center gap-2">
-            <Zap className="fill-indigo-600" />
-            <span>Directly</span>
-          </div>
+              <img src='log.webp' className=' w-[50px] rounded-full ' alt='Direop Logo'/>
+                <span className="text-[23px] font-bold tracking-[2px]  text-slate-900 dark:text-white translate-x-[-14px]">ireop</span>
+              </div>
           <button className="md:hidden text-slate-400" onClick={() => setSidebarOpen(false)}>
             <X size={24} />
           </button>
@@ -409,7 +453,7 @@ console.log("User Status:", { isSubscribed, plan });
 
         <nav className="flex-1 px-4 space-y-1 mt-4">
           <NavItem icon={<LayoutGrid size={20} />} href="/dashboard" label="Dashboard" active />
-          <NavItem icon={<LinkIcon size={20} />} href="/links" label="My Links" />
+          <NavItem icon={<LinkIcon size={20} />} href="/links" label="My Analytics Links" />
           {/* <NavItem icon={<BarChart3 size={20} />} label="Analytics" /> */}
           <NavItem icon={<Settings size={20} />} href="/settings" label="Settings" />
         </nav>
@@ -422,7 +466,7 @@ console.log("User Status:", { isSubscribed, plan });
       <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full uppercase tracking-wider font-bold">Best Value</span>
     </div>
     
-    <p className="font-bold text-sm mb-3">Unlimited Deep Links</p>
+    <p className="font-bold text-sm mb-3">Unlimited Active Links</p>
     
     <button onClick={handleSubscribe} className="w-full bg-white text-indigo-600 py-2 rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors shadow-sm">
       Upgrade for $4.5/mo
@@ -444,9 +488,9 @@ console.log("User Status:", { isSubscribed, plan });
 </div> : <div className="p-4">
           <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-4 text-white shadow-lg shadow-indigo-200">
             <p className="text-xs opacity-80 mb-1 font-medium italic">Pro Plan</p>
-            <p className="font-bold text-sm mb-3">Unlimited Deep Links</p>
+            <p className="font-bold text-sm mb-3">Unlimited Active Links</p>
               <div className={`px-4 py-1.5 rounded-xl text-[11px] w-max font-black uppercase tracking-wider flex items-center gap-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100`}>
-                     <ShieldCheck size={17}/> Active
+                     <ShieldCheck size={17}/> Active Subscription
                     
                     </div>
           </div>
@@ -497,15 +541,15 @@ console.log("User Status:", { isSubscribed, plan });
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-8 lg:p-8">
-          
+          {subscriptionPlan === 'free' && isSubscribed && new Date() < new Date(subscriptionEndsAt) && <p className=' text-amber-600 text-center p-[5px] '>Your Pro Subscription will end on {subscriptionEndsAt.split('T')[0]} , You can renew your subscription on {subscriptionEndsAt.split('T')[0]}</p> }
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h1 className="text-4xl font-bold text-slate-900 leading-tight tracking-tight mb-4">Increase Your Conversions via deep link 🚀</h1>
+            <h1 className="text-4xl font-bold text-slate-900 leading-tight tracking-tight mb-4">Redirect 100+ TikTok Bio accounts instantly 🚀</h1>
             <p className="text-slate-600 text-[18px] text-lg">
-              {isSubscribed ? 'Power up your conversions and reach with deep links that open instantly in any app. Create unlimited links—up to 9 new links every 24 hours maximum. ' : "Create smart deep links that drive higher conversions across Amazon, YouTube, Instagram, TikTok, and more. 🚀 Upgrade to PRO with secure payment for unlimited link creation! ⚡ Full control—cancel your subscription anytime from your settings. 🛡️"}
+              {isSubscribed ? 'Stop wasting hours on manual updates. Redirect 100+ TikTok Bio accounts instantly from one dashboard. Create unlimited links—up to 9 new links every 24 hours maximum. ' : "Stop wasting hours on manual updates. Redirect 100+ TikTok Bio accounts instantly from one dashboard 🚀 Upgrade to PRO with secure payment for unlimited link creation! ⚡ Full control—cancel your subscription anytime from your settings. 🛡️"}
             </p>
-            {!isSubscribed ? <p className='mt-[23px] lg:w-[77%] mx-auto bg-amber-200 text-[13px] font-semibold p-[10px] rounded-[5px] '>Free Plan: Create 1 smart deep link, valid for 24 hours only. Perfect for testing performance before upgrading to unlimited, permanent links.</p> 
+            {!isSubscribed ? <p className='mt-[23px] lg:w-[77%] mx-auto bg-amber-200 text-[13px] font-semibold p-[10px] rounded-[5px] '>Free Plan: Create 3 smart dynanmic link, valid for 48 hours only. Perfect for testing performance before upgrading to unlimited, permanent links.</p> 
             :
-            <p className='mt-[23px] lg:w-[77%] mx-auto bg-amber-200 text-[15px] font-semibold p-[10px] rounded-[5px] '>PRO Plan: Unlimited permanent links  ( Daily creation limit: 9 links ). </p>
+            <p className='mt-[23px] lg:w-[77%] mx-auto bg-amber-200 text-[15px] font-semibold p-[10px] rounded-[5px] '>PRO Plan: Unlimited permanent links  ( Daily creation limit: 10 links ). </p>
             }
           </div>
 
@@ -540,8 +584,8 @@ console.log("User Status:", { isSubscribed, plan });
     Custom Alias (Optional)
   </label>
   <div className="relative flex items-center">
-    <div className="absolute inset-y-0  pl-4 flex items-center pointer-events-none text-slate-400 text-sm font-bold">
-      {host}/go/
+    <div className="absolute inset-y-0  pl-4 flex items-center pointer-events-none text-slate-500 text-[15px] font-bold">
+      direop.com/go/
     </div>
     <input 
       type="text"
@@ -561,7 +605,7 @@ console.log("User Status:", { isSubscribed, plan });
   setSlugError('');
 }}
       placeholder="my-awesome-link"
-      className={`w-full pl-[155px] pr-4 py-4 bg-slate-50 border ${slugError ? 'border-red-500' : 'border-slate-100'} rounded-2xl focus:ring-2 focus:ring-indigo-600 outline-none font-bold text-slate-700 transition-all`}
+      className={`w-full pl-[131px] text-[15px] pr-4 py-4 bg-slate-50 border ${slugError ? 'border-red-500' : 'border-slate-100'} rounded-2xl focus:ring-2 focus:ring-indigo-600 outline-none font-bold text-slate-700 transition-all`}
     />
   </div>
   {slugError && <p className="text-red-500 text-[12px] font-bold ml-2">{slugError}</p>}
@@ -621,12 +665,17 @@ console.log("User Status:", { isSubscribed, plan });
           </form>
 
           <div className="max-w-3xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            <InfoCard color="amber" title="Pro Tip" desc="Deep links can increase conversion by 300% on TikTok , Amazon ..." />
-            <InfoCard color="indigo" title="Need Help?" desc="Contact our 24/7 support for enterprise solutions." />
+<InfoCard 
+  color="red" 
+  title="Pro Tip" 
+  desc="Switching your link destination externally prevents TikTok activity flags and keeps your accounts safe from shadowbans." 
+/>            <InfoCard color="indigo" title="Need Help?" desc="Contact our 24/7 support for enterprise solutions." />
           </div>
 
         </div>
       </main>
+          {Subs && <div className=' absolute bg-gray-700  opacity-[0.3] z-[9]  h-[100%] w-[100%] '></div>}
+
     </div>
   );
 };
@@ -643,7 +692,7 @@ const InfoCard = ({ color, title, desc }) => (
     <div className={`w-10 h-10 bg-${color}-100 rounded-xl flex items-center justify-center text-${color}-600 shrink-0 font-black italic`}>!</div>
     <div>
       <h4 className={`font-bold text-${color}-900 text-sm`}>{title}</h4>
-      <p className={`text-${color}-700 text-xs leading-relaxed mt-1`}>{desc}     { title == "Need Help?" && <a className=' text-[12px] font-bold ' href="mailto:ay.bouguern@gmail.com">Email : ay.bouguern@gmail.com </a>}
+      <p className={`text-${color}-700 text-xs leading-relaxed mt-1`}>{desc}     { title == "Need Help?" && <a className=' text-[12px] font-bold ' href="mailto:direopsupp@gmail.com">Email : direopsupp@gmail.com </a>}
 </p>
     </div>
     <br/>
@@ -652,3 +701,29 @@ const InfoCard = ({ color, title, desc }) => (
 );
 
 export default Dashboard;
+
+
+
+
+//sandbox
+
+{/* <div id="paypal-button-container-P-0PN22317719958939NFSLTTA"></div>
+<script src="https://www.paypal.com/sdk/js?client-id=ARGPHh-iy1nZ_KusDoY2BOt65fMFQJrr84apNWJFi-9tcWTFa8PNfNhhKjsxu1KSw71NYfIkH-h0kKew&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+<script>
+  paypal.Buttons({
+      style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'subscribe'
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({
+          plan_id: 'P-0PN22317719958939NFSLTTA'
+        });
+      },
+      onApprove: function(data, actions) {
+        alert(data.subscriptionID); 
+      }
+  }).render('#paypal-button-container-P-0PN22317719958939NFSLTTA'); // Renders the PayPal button
+</script> */}

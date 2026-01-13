@@ -39,7 +39,7 @@ export default function SettingsPage() {
           </Link>
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Account Settings</h1>
 
-      {profile?.is_subscribed ? (
+      {profile?.is_subscribed && profile?.subscription_plan === 'PRO' ? (
         /* PRO Subscriber UI */
         <div className="space-y-6">
           <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -74,7 +74,8 @@ export default function SettingsPage() {
               You can manage your subscription, update payment methods, or cancel through our official payment portal.
             </p>
             <a
-              href={profile.customer_portal_url}
+              href='https://www.sandbox.paypal.com/myaccount/autopay/'
+              // onClick={() => window.open('https://www.paypal.com/myaccount/autopay/', '_blank')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex cursor-pointer items-center justify-center w-full px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-semibold"
@@ -87,18 +88,32 @@ export default function SettingsPage() {
         /* Free User UI */
         <div className="space-y-6">
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
-            <p className="text-gray-600 font-medium">You are currently on the Free Plan</p>
-            <p className="text-gray-400 text-sm">Upgrade to PRO for unlimited features</p>
+            <p className="text-gray-600 font-medium">You are currently on the {profile?.is_subscribed && new Date(profile?.subscription_ends_at) > new Date() ? 'PRO' : 'Free'} Plan</p>
+            {profile?.is_subscribed && new Date(profile?.subscription_ends_at) > new Date() ? <p className="text-gray-600 text-[15px]">Wait until your current subscription ends, then you can renews.</p> : <p className="text-gray-400 text-sm">Upgrade to PRO for unlimited features</p> }
+            
           </div>
 
-          <button
+         
+          {profile?.is_subscribed && new Date(profile?.subscription_ends_at) > new Date() && profile?.subscription_plan == 'free' ? 
+          
+           <button
+            onClick={() => window.location.href = '/dashboard/upgrade'}
+            disabled={true}
+            className="w-full bg-gray-600 text-white py-3 rounded-xl font-bold  shadow-lg shadow-indigo-200 transition-all"
+          >
+            Upgrade to PRO Now
+          </button>:
+           <button
             onClick={() => window.location.href = '/dashboard/upgrade'}
             className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all"
           >
             Upgrade to PRO Now
-          </button>
+          </button> 
+          }
         </div>
       )}
+      {profile?.is_subscribed && new Date(profile?.subscription_ends_at) > new Date()  && profile?.subscription_plan == 'free' && <p className=' py-[35px] text-amber-600 text-center p-[5px] '>Your current subscription is still valid. Wait until this date when the subscription ends  {profile?.subscription_ends_at.split('T')[0]}, and you can subscribe then.</p>}
+        {/* <p>اشتراكك الحالي لا يزال سارياً حتى {user.subscription_ends_at}</p> */}
 
       <div className="mt-8 pt-6 border-t border-gray-100 text-center">
         <p className="text-xs text-gray-400">Account ID: {profile?.id}</p>

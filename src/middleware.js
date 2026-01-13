@@ -45,6 +45,8 @@
 // export const config = {
 //   matcher: ['/dashboard/:path*', '/login'],
 // };
+// src/middleware.js
+// src/middleware.js
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
@@ -64,33 +66,18 @@ export async function middleware(req) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
+  const url = req.nextUrl.clone();
 
-  // 1. حماية المسارات العامة (تسجيل الدخول)
-  if (!user && req.nextUrl.pathname.startsWith('/dashboard')) {
+  // 1. منع غير المسجلين من دخول الصفحات الحساسة
+  const protectedPaths = ['/dashboard', '/upgrade', '/links', '/settings'];
+  const isProtected = protectedPaths.some(path => url.pathname.startsWith(path));
+
+  if (!user && isProtected) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  // 2. حماية المسارات المدفوعة (Premium Features)
-  // لنفترض أن ميزات الـ PRO موجودة داخل /dashboard/pro-tools
-  if (req.nextUrl.pathname.startsWith('/dashboard/pro-tools')) {
-    
-    // جلب بيانات الاشتراك من جدول profiles
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_subscribed, subscription_ends_at')
-      .eq('id', user.id)
-      .single();
-
-    const isExpired = profile?.subscription_ends_at && new Date(profile.subscription_ends_at) < new Date();
-
-    // إذا لم يكن مشتركاً أو اشتراكه انتهى
-    if (!profile?.is_subscribed || isExpired) {
-      // توجيهه لصفحة الترقية (Upgrade Page)
-      return NextResponse.redirect(new URL('/dashboard/upgrade', req.url));
-    }
-  }
-
-  if (user && req.nextUrl.pathname.startsWith('/login')) {
+  // 2. منع المسجلين من العودة لصفحة Login
+  if (user && url.pathname.startsWith('/login')) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
@@ -98,5 +85,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login'],
+  matcher: ['/dashboard/:path*', '/upgrade/:path*', '/links/:path*', '/settings/:path*', '/login'],
 };

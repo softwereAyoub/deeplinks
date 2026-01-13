@@ -355,8 +355,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Zap, CheckCircle, Smartphone, ArrowRight, 
-  BarChart3, Globe, ShieldCheck, Mail, Instagram, MousePointerClick, Share2, Plus,KeyRound,
-  Minus, Sun, Moon 
+  BarChart3, Globe, ShieldCheck, Mail, Menu, MousePointerClick, Share2, Plus,KeyRound,X,
+  Minus, Sun, Moon ,Layers,TrendingUp,Clock
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -365,6 +365,8 @@ import { supabase } from '@/lib/supabase';
 export default function LandingPage() {
   const [activeFaq, setActiveFaq] = useState(null);
   const [isDark, setIsDark] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
   const [authChecked, setAuthChecked] = useState(false);
 const router = useRouter();
   // دالة تفعيل الوضع الليلي
@@ -396,25 +398,33 @@ setTimeout(() => {
     checkUser();
   }, []);
 
-  const faqs = [
-    {
-      q: "Why do I need a Deep Link?",
-      a: "Standard links open in the 'In-App Browser' which logs users out of their accounts. Deep links bypass this, opening the native app (Amazon ,YouTube, Instagram , Tiktok ...) where users are already logged in, increasing conversion and engagement by up to 40%."
-    },
-    {
-  q: "Can I try DeepLinker for free?",
-  a: "Yes! You can create a free 'Speed-Test' link to experience the performance yourself. This link is active for 24 hours, allowing you to verify the lightning-fast redirection and app-opening technology before upgrading to a Pro plan."
-},
-    {
-      q: "Is it a one-time payment or monthly?",
-      a: "Get full access to all Pro features for just $4.50/month. Boost your conversions with our most powerful tools."
-    },
- {
-  q: "Which platforms does DeepLinker support?",
-  a: "DeepLinker is optimized for maximum conversions on Amazon and supports all major social platforms including YouTube, Instagram, TikTok, and Facebook..."
-},
-
-  ];
+  const toggleMenu = () => setIsOpen(!isOpen);
+const faqs = [
+  {
+    q: "Why do I need a Dynamic Link?",
+    a: "Standard links are static; once they're set, you can't change them. Our Dynamic Links give you total control, allowing you to change your destination URL across 100+ accounts instantly from one dashboard without ever needing to update your bios manually."
+  },
+  {
+    q: "Can I try the dashboard for free?",
+    a: "Yes! You can create a free 'Speed-Test' link to experience the redirection performance yourself. This allows you to verify our lightning-fast redirection technology and dashboard management before upgrading to a Pro plan."
+  },
+  {
+    q: "How does this protect my TikTok accounts?",
+    a: "Every time you log in to change a link manually, you risk triggering TikTok's security flags. Our tool allows you to update your link destinations 'Server-Side'. This means you can pivot your traffic to new offers without ever touching the TikTok app, keeping your accounts safe from activity-based bans."
+  },
+  {
+    q: "Can I update 100+ accounts at the same time?",
+    a: "Absolutely. Our Bulk Redirect Engine is built for scale. You can select all your links and change their destination URL in one click. It takes less than a second to update your entire automation empire."
+  },
+  {
+    q: "Is it a one-time payment or monthly?",
+    a: "Get full access to all Pro features, including Bulk Updates and Advanced Analytics, for just $4.50/month. Scale your automation empire with our most powerful tools."
+  },
+  {
+    q: "Which platforms does our tool support?",
+    a: "Our service is optimized for maximum performance on TikTok and supports all major social and affiliate platforms including Amazon, YouTube, Instagram, and Facebook, allowing you to redirect traffic anywhere you want."
+  },
+];
 
   return (
     // هذا هو الغلاف الرئيسي الذي يحدد الوضع
@@ -423,41 +433,62 @@ setTimeout(() => {
       <div className="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-indigo-100 selection:text-indigo-700 transition-colors duration-300">
         
         {/* --- Navigation --- */}
-        <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none">
-                <Zap size={24} className="text-white fill-white" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">DeepLinker</span>
-            </div>
-            
-            <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-400">
-              <a href="#features" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Features</a>
-              <a href="#how-it-works" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">How it works</a>
-              <a href="#pricing" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Pricing</a>
-              <a href="#faq" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">FAQ</a>
-            </div>
+ <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+        
+        {/* Logo Section */}
+        <div className="flex items-center gap-1 shrink-0">
+          <img src='log.webp' className='w-[45px] sm:w-[55px] rounded-full' alt='Direop Logo'/>
+          <span className="text-[18px] sm:text-[22px] font-bold tracking-[1px] text-slate-900 dark:text-white translate-x-[-9px]">
+            ireop
+          </span>
+        </div>
 
-            <div className="flex items-center gap-4">
-              {/* زر تغيير الوضع */}
-              <button 
-                onClick={toggleTheme} 
-                className="p-2 rounded-full hover:bg-black bg-slate-800 dark:bg-slate-100 dark:transition-all dark:duration-500 dark:hover:bg-slate-100 transition-colors"
-                aria-label="Toggle Dark Mode"
-              >
-                {isDark ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-slate-100" />}
-              </button>
+        {/* Desktop Links (Hidden on Mobile) */}
+        <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-400">
+          <a href="#features" className="hover:text-indigo-600 transition-colors">Features</a>
+          <a href="#how-it-works" className="hover:text-indigo-600 transition-colors">How it works</a>
+          <a href="#pricing" className="hover:text-indigo-600 transition-colors">Pricing</a>
+                    <a href="#faq" className="hover:text-indigo-600 transition-colors">FAQ</a>
 
-              <Link href="/login" className="text-sm font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 px-4 transition-colors">
-                Sign In
-              </Link>
-              <Link href="/login?signup=true" className="bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-700 text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-slate-200 dark:shadow-none">
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </nav>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button 
+            onClick={() => setIsDark(!isDark)} 
+            className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:scale-110 transition-all"
+          >
+            {isDark ? <Sun size={18} className="text-yellow-500" /> : <Moon size={18} className="text-slate-600" />}
+          </button>
+
+          <Link href="/login" className="hidden sm:block text-sm font-bold text-slate-700 dark:text-slate-200">
+            Sign In
+          </Link>
+          
+          <Link href="/login?signup=true" className="bg-slate-900 dark:bg-indigo-600 text-white px-4 sm:px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+            Get Started
+          </Link>
+
+          {/* Hamburger Button (Visible only on Mobile) */}
+          <button onClick={toggleMenu} className="md:hidden p-2 text-slate-700 dark:text-slate-300 focus:outline-none">
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay (Animated) */}
+      <div className={`md:hidden absolute top-20 left-0 w-full bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 transition-all duration-300 ease-in-out ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+        <div className="flex flex-col p-6 gap-4 font-semibold text-slate-600 dark:text-slate-300">
+          <a href="#features" onClick={toggleMenu} className="hover:text-indigo-600 py-2 border-b border-slate-50 dark:border-slate-900">Features</a>
+          <a href="#how-it-works" onClick={toggleMenu} className="hover:text-indigo-600 py-2 border-b border-slate-50 dark:border-slate-900">How it works</a>
+          <a href="#pricing" onClick={toggleMenu} className="hover:text-indigo-600 py-2 border-b border-slate-50 dark:border-slate-900">Pricing</a>
+                  <a href="#faq" onClick={toggleMenu} className="hover:text-indigo-600 py-2 border-b border-slate-50 dark:border-slate-900">FAQ</a>
+
+          <Link href="/login" onClick={toggleMenu} className="text-indigo-600 pt-2">Sign In</Link>
+        </div>
+      </div>
+    </nav>
 
         {/* --- Hero Section --- */}
         <section className="relative pt-40 pb-20 px-4 overflow-hidden">
@@ -480,14 +511,14 @@ setTimeout(() => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
               </span>
-              Eliminate the In-App Browser Problem
+              Stop wasting hours on manual updates
             </div>
             
             {/* Title */}
             <h1 className="text-5xl md:text-7xl font-[900] text-slate-900 dark:text-white mb-8 tracking-tight leading-[1.1]">
-         Turn Every Click into a     <br />
-              <span className="text-indigo-600 dark:text-indigo-400 relative inline-block">
-Sale Not a Login               {/* Decoration Line */}
+       Manage Hundreds of TikTok Links with     
+              <span className="text-indigo-600 dark:text-indigo-400 relative pl-[8px] inline-block">
+ One Click               {/* Decoration Line */}
                 <svg className="absolute -bottom-2 left-0 w-full h-3 text-indigo-200 dark:text-indigo-900" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M2 10C50 2 150 2 198 10" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/>
                 </svg>
@@ -496,8 +527,7 @@ Sale Not a Login               {/* Decoration Line */}
             
             {/* Subtitle */}
             <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed font-semibold">
-              Stop losing 40% of your conversion and engagement. DeepLinker helps influencers and brands bypass the "login wall" and send audiences directly to apps.
-            </p>
+Stop wasting hours on manual updates. Redirect 100+ TikTok accounts instantly from one dashboard. Track real-time clicks and switch to high-paying offers in seconds. Scale your automation empire smarter, faster, and safer.           </p>
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20">
@@ -520,15 +550,16 @@ Sale Not a Login               {/* Decoration Line */}
                     <div className="w-3 h-3 rounded-full bg-amber-400"></div>
                     <div className="w-3 h-3 rounded-full bg-green-400"></div>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-900 text-[10px] text-slate-400 px-10 py-1.5 rounded-md mx-auto font-mono border border-slate-100 dark:border-slate-800">
-                    deeplinker.com/your-smart-link
+                  <div className="bg-slate-50 md:mb-[25px] dark:bg-slate-900 text-[10px] text-slate-400 px-10 py-1.5 rounded-md mx-auto font-mono border border-slate-100 dark:border-slate-800">
+                    direop.com/go/your-smart-link
                   </div>
                 </div>
-                <div className="h-64 md:h-96 bg-white dark:bg-slate-900 flex items-center justify-center italic text-slate-300 dark:text-slate-700">
+                <div className=" md:h-96 bg-white dark:bg-slate-900 flex items-center justify-center italic text-slate-300 dark:text-slate-700">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                    {/* <div className="w-16 h-16 hidden sm:flex bg-slate-50 dark:bg-slate-800 rounded-full  items-center justify-center">
                       <Zap className="text-slate-200 dark:text-slate-700 fill-slate-200 dark:fill-slate-700" />
-                    </div>
+                    </div> */}
+                    <img src='dash.webp' alt='Dashboard Preview' className='w-full max-sm:w-[97%]  rounded-[8px] '/>
                     <p className="text-sm font-bold text-slate-200 dark:text-slate-700 uppercase tracking-widest">Dashboard Preview</p>
                   </div>
                 </div>
@@ -538,28 +569,46 @@ Sale Not a Login               {/* Decoration Line */}
         </section>
 
         {/* --- How It Works --- */}
+      
         <section id="how-it-works" className="py-24 px-6 border-y border-slate-50 dark:border-slate-900 bg-slate-50/50 dark:bg-slate-900/50">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-extrabold mb-4 text-slate-900 dark:text-white uppercase tracking-tight">3 Simple Steps</h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 relative">
-              {[
-                { icon: <MousePointerClick size={28}/>, title: "1. Paste Your Link", desc: "Copy any URL from Amazon ,YouTube, Instagram, or TikTok and paste it into DeepLinker.", color: "indigo" },
-                { icon: <Zap size={28}/>, title: "2. We Deepen It", desc: "Our engine wraps your URL in a smart-logic that bypasses mobile browsers.", color: "violet" },
-                { icon: <Share2 size={28}/>, title: "3. Share & Grow", desc: "Post your new link. Users will land directly in the native app, logged in and ready.", color: "emerald" }
-              ].map((step, i) => (
-                <div key={i} className="bg-white dark:bg-slate-950 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 relative z-10 text-center">
-                  <div className={`w-14 h-14 bg-${step.color}-50 dark:bg-${step.color}-900/20 text-${step.color}-600 dark:text-${step.color}-400 rounded-2xl flex items-center justify-center mx-auto mb-6`}>
-                    {step.icon}
-                  </div>
-                  <h4 className="font-bold text-lg mb-2 text-slate-900 dark:text-white">{step.title}</h4>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{step.desc}</p>
-                </div>
-              ))}
-            </div>
+  <div className="max-w-7xl mx-auto">
+    <div className="text-center mb-16">
+      <h2 className="text-3xl font-extrabold mb-4 text-slate-900 dark:text-white uppercase tracking-tight">Scale in 3 Simple Steps</h2>
+      <p className="text-slate-500 dark:text-slate-400">The ultimate workflow for TikTok Automation experts.</p>
+    </div>
+    
+    <div className="grid md:grid-cols-3 gap-8 relative">
+      {[
+        { 
+          icon: <Layers size={28}/>, 
+          title: "1. Deploy Your Links", 
+          desc: "Create your unique smart-links and place them across your TikTok accounts. Set them up once, and never touch the app again.", 
+          color: "indigo" 
+        },
+        { 
+          icon: <Zap size={28}/>, 
+          title: "2. Bulk Update Instantly", 
+          desc: "Offer expired? Use our Bulk Redirect tool to change the destination of 100+ accounts in one click from your dashboard.", 
+          color: "violet" 
+        },
+        { 
+          icon: <TrendingUp size={28}/>, 
+          title: "3. Track & Optimize", 
+          desc: "Monitor live clicks and performance metrics. Instantly pivot your traffic to the highest-paying offers to maximize ROI.", 
+          color: "emerald" 
+        }
+      ].map((step, i) => (
+        <div key={i} className="bg-white dark:bg-slate-950 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 relative z-10 text-center">
+          <div className={`w-14 h-14 bg-${step.color}-50 dark:bg-${step.color}-900/20 text-${step.color}-600 dark:text-${step.color}-400 rounded-2xl flex items-center justify-center mx-auto mb-6`}>
+            {step.icon}
           </div>
-        </section>
+          <h4 className="font-bold text-lg mb-2 text-slate-900 dark:text-white">{step.title}</h4>
+          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{step.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
 
         {/* --- Pricing --- */}
         <section id="pricing" className="py-24 px-6 bg-white dark:bg-slate-950">
@@ -584,13 +633,21 @@ Sale Not a Login               {/* Decoration Line */}
   <span className="text-slate-400 dark:text-slate-500 font-bold text-lg self-end mb-1 ml-1">/mo</span>
 </div>
               <ul className="space-y-4 mb-8">
-                {['Unlimited Deep Links', 'Real-Time Click Insights', 'Custom Slug Names', 'Instant App-Redirects', 'Priority Support'].map((item) => (
+                {[
+  'Unlimited Dynamic Links', 
+  'Bulk Destination Links Updates', 
+  'Real-Time Click Insights', 
+  'Instant Redirects',
+  'Anti-Ban Account Protection', 
+  'Custom Slug Names',
+  'Priority 24/7 Support'
+].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-slate-600 dark:text-slate-300 font-medium text-sm">
                     <CheckCircle size={18} className="text-indigo-600 dark:text-indigo-400" /> {item}
                   </li>
                 ))}
               </ul>
-              <Link href="/login" className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 dark:shadow-none">
+              <Link href="/login?signup=true" className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 dark:shadow-none">
                 Get Started Now
               </Link>
             </div>
@@ -599,7 +656,7 @@ Sale Not a Login               {/* Decoration Line */}
 
         {/* --- Features --- */}
      
-
+{/* 
         <section id="features" className="py-24 px-6 bg-white dark:bg-slate-950">
   <div className="max-w-7xl mx-auto">
     <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -675,6 +732,76 @@ Sale Not a Login               {/* Decoration Line */}
 
     </div>
   </div>
+</section> */}
+
+<section id="features" className="py-24 px-6 bg-white dark:bg-slate-950">
+  <div className="max-w-7xl mx-auto">
+    <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <h2 className="text-4xl font-extrabold mb-6 leading-tight text-slate-900 dark:text-white">
+          Built for <br/>
+          <span className="text-indigo-600 dark:text-indigo-400">Automation Empires</span>
+        </h2>
+        <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium italic">
+          "The biggest risk to your automation business isn't the algorithm—it's the manual repetitive work that flags your accounts."
+        </p>
+        
+        <div className="space-y-6">
+          {[
+            {
+              title: "Anti-Ban Protection", 
+              desc: "Avoid shadowbans by eliminating frequent logins. Update your link destinations server-side without ever touching your TikTok app.", 
+              icon: <ShieldCheck size={20}/>
+            },
+             {
+              title: "Bulk Redirect Engine", 
+              desc: "Switch the destination of 10, 50, or 100 links simultaneously. Pivot to winning offers in one click as soon as they go viral.", 
+              icon: <Zap size={20}/>
+            },
+            {
+              title: "Advanced Performance Tracking", 
+              desc: "Get deep insights into your traffic. Monitor which accounts are performing best with daily, weekly, and all-time click data.", 
+              icon: <BarChart3 size={20}/>
+            }
+          ].map((f, i) => (
+            <div key={i} className="flex gap-4 p-5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800">
+              <div className="text-indigo-600 dark:text-indigo-400 mt-1 bg-indigo-50 dark:bg-indigo-900/30 p-2 rounded-lg h-fit">{f.icon}</div>
+              <div>
+                <h4 className="font-bold text-slate-900 dark:text-white">{f.title}</h4>
+                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{f.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden border border-white/10">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full -mr-20 -mt-20 blur-3xl" />
+        
+        <div className="relative z-10">
+          <div className="mb-6 inline-block bg-indigo-500/20 py-1 px-4 rounded-full border border-indigo-400/30">
+            <span className="text-xs font-bold uppercase tracking-widest">Scaling Psychology</span>
+          </div>
+          
+          <h3 className="text-2xl md:text-3xl font-bold mb-6 leading-snug">
+            "Automation is not about doing more work; it's about removing the manual friction that limits your growth."
+          </h3>
+          
+          <hr className="border-white/10 mb-6" />
+          
+          <div className="flex items-start gap-4">
+            <div className="text-indigo-400">
+              <Clock size={32} fill="currentColor" className="opacity-50" />
+            </div>
+            <p className="text-indigo-100/80 leading-relaxed italic">
+              Every time you log in to change a link, you're not just wasting 5 minutes—you're exposing your accounts to <strong>Activity Pattern Tracking</strong>. Real scaling happens when you control your traffic externally, keeping your accounts safe and your time free.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </section>
 
 
@@ -705,15 +832,63 @@ Sale Not a Login               {/* Decoration Line */}
           </div>
         </section>
 
+   <section className="py-24 px-6">
+  <div className="max-w-6xl mx-auto relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-indigo-900 to-slate-900 p-10 md:p-20 text-center shadow-2xl border border-white/10">
+    
+    {/* العناصر الجمالية (نفس الـ Blur الموجود في القسم السابق) */}
+    <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full -mr-32 -mt-32 blur-3xl pointer-events-none" />
+    <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full -ml-32 -mb-32 blur-3xl pointer-events-none" />
+
+    <div className="relative z-10">
+      {/* Badge صغير فوق العنوان */}
+      <div className="mb-6 inline-block bg-indigo-500/20 py-1.5 px-4 rounded-full border border-indigo-400/20">
+        <span className="text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em]">Ready to take control?</span>
+      </div>
+
+      <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight">
+        Scale Your Empire <br className="hidden md:block"/> Without the Manual Hassle.
+      </h2>
+      
+      <p className="text-indigo-100/80 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
+        Join the high-performance players who manage their entire network with speed and security. Start for free and dominate your niche.
+      </p>
+
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+        <Link 
+          href="/login?signup=true" 
+          className="w-full sm:w-auto px-12 py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all transform hover:scale-105 shadow-xl shadow-indigo-900/20 uppercase tracking-widest text-xs"
+        >
+          Get Started For Free
+        </Link>
+        
+        <Link 
+          href="#pricing" 
+          className="w-full sm:w-auto px-12 py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black rounded-2xl transition-all backdrop-blur-md uppercase tracking-widest text-xs"
+        >
+          View Pro Pricing
+        </Link>
+      </div>
+
+      <div className="mt-10 flex items-center justify-center gap-2 opacity-50">
+        <div className="h-1 w-1 bg-emerald-400 rounded-full animate-pulse"></div>
+        <p className="text-white text-[10px] font-bold uppercase tracking-widest">
+          Join 50+ early access members today
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
         {/* --- Footer --- */}
         <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900 pt-16 pb-8">
           <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-2 space-y-4">
               <div className="flex items-center gap-2">
-                <Zap size={24} className="text-indigo-600 dark:text-indigo-400 fill-indigo-600 dark:fill-indigo-400" />
-                <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">DeepLinker</span>
+              <img src='log.webp' className=' w-[55px] rounded-full ' alt='Direop Logo'/>
+                <span className="text-[22px] font-bold tracking-[1px]  text-slate-900 dark:text-white translate-x-[-14px]">ireop</span>
               </div>
-              <p className="text-slate-400 dark:text-slate-500 max-w-sm text-sm">Eliminating friction in the customer journey by connecting social media directly to native apps since 2024.</p>
+              <p className="text-slate-400 dark:text-slate-500 max-w-sm text-sm">
+Empowering TikTok automation and link management with seamless bulk control since 2024.                </p>
             </div>
             <div>
               <h4 className="font-bold mb-4 text-sm uppercase tracking-widest text-slate-900 dark:text-white">Legal</h4>
@@ -727,13 +902,13 @@ Sale Not a Login               {/* Decoration Line */}
               <h4 className="font-bold mb-4 text-sm uppercase tracking-widest text-slate-900 dark:text-white">Contact</h4>
               <ul className="space-y-2 text-sm text-slate-500 font-medium">
                 <li><a href="mailto:support@deeplinker.com" className="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-2 text-slate-400 dark:text-slate-500">
-                  <Mail size={16} /> support@deeplinker.com
+                  <Mail size={16} /> direopsupp@gmail.com
                 </a></li>
               </ul>
             </div>
           </div>
           <div className="max-w-7xl mx-auto px-6 text-center border-t border-slate-200/50 dark:border-slate-900 pt-8 text-slate-400 dark:text-slate-600 text-xs font-medium">
-            © 2026 DeepLinker. All rights reserved.
+            © 2026 Direop. All rights reserved.
           </div>
         </footer>
       </div>

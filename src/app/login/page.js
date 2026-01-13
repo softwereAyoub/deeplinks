@@ -6,7 +6,7 @@ import { Zap, Mail, Lock, Chrome, KeyRound, ArrowLeft } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react'
-
+import Link from 'next/link';
 export default function LoginPage() {
   return (
     <Suspense fallback={  <div className="flex flex-col items-center justify-center h-screen bg-white">
@@ -188,8 +188,10 @@ const handleVerifyOTP = async (e) => {
         
         {/* Header Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 rounded-2xl text-indigo-600 mb-4">
-            <Zap size={28} className="fill-indigo-600" />
+          <div className="inline-flex items-center justify-center w-14 h-14  mb-4">
+              <img src='log.webp' className=' w-[50px] rounded-full ' alt='Direop Logo'/>
+                              <span className="text-[23px] font-bold tracking-[2px]  text-slate-900 dark:text-white translate-x-[-7px]">ireop</span>
+
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
             {step === 'verify-otp' ? "Verify Code" : step === 'forgot-password' ? "Reset Password" : (isSignUp ? "Create Account" : "Welcome Back")}
@@ -237,9 +239,9 @@ const handleVerifyOTP = async (e) => {
           </form>
         ) : (
           <>
-            <button onClick={handleGoogleLogin} className="w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-100 py-4 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition-all mb-6 shadow-sm">
-              <Chrome size={20} className="text-red-500" />
-              {isSignUp ? "Sign up with Google" : "Continue with Google"}
+            <button onClick={handleGoogleLogin} className="w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-100 py-4 rounded-2xl font-semibold text-slate-700 hover:bg-slate-50 transition-all mb-6 shadow-sm">
+              <img src='google.png' alt="Google" className="w-5 h-5" />
+              {isSignUp ? "Sign up with Google" : "Sign in with Google"}
             </button>
 
             <div className="relative mb-8 text-center">
@@ -269,6 +271,12 @@ const handleVerifyOTP = async (e) => {
               <button disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 mt-2">
                 {loading ? 'Processing...' : (isSignUp ? 'Sign Up' : 'Sign In')}
               </button>
+          {isSignUp ?     <p className="mt-4 text-[12px] text-center text-slate-400 leading-relaxed px-4">
+    By creating an account, you agree to our 
+    <Link href="/terms" className="text-indigo-500 hover:underline mx-1 font-semibold">Terms of Service</Link> 
+    and 
+    <Link href="/privacy" className="text-indigo-500 hover:underline mx-1 font-semibold">Privacy Policy</Link>.
+  </p> : null}
 
               <p onClick={() => setIsSignUp(!isSignUp)} className="cursor-pointer text-slate-500 text-center mt-6 font-medium text-sm">
                 {isSignUp ? "Already have an account?" : "Don't have an account?"} <span className="text-indigo-600 font-bold ml-1 hover:underline">{isSignUp ? "Sign In" : "Sign Up"}</span>
@@ -280,3 +288,32 @@ const handleVerifyOTP = async (e) => {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+// <div id="paypal-button-container-P-6AD80152G40923511NFR6OVQ"></div>
+// <script src="https://www.paypal.com/sdk/js?client-id=AcAKIARVYtE8l6w9gtcDOBxhSNMZOM_gq52XGtQx7DmAEkD-TCFAx-4mmCNKw2sFpH6hQHKVFOKPqQnO&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+// <script>
+//   paypal.Buttons({
+//       style: {
+//           shape: 'rect',
+//           color: 'gold',
+//           layout: 'vertical',
+//           label: 'subscribe'
+//       },
+//       createSubscription: function(data, actions) {
+//         return actions.subscription.create({
+//           /* Creates the subscription */
+//           plan_id: 'P-6AD80152G40923511NFR6OVQ'
+//         });
+//       },
+//       onApprove: function(data, actions) {
+//         alert(data.subscriptionID); // You can add optional success message for the subscriber here
+//       }
+//   }).render('#paypal-button-container-P-6AD80152G40923511NFR6OVQ'); // Renders the PayPal button
+// </script>
