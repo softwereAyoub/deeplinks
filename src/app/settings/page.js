@@ -29,6 +29,68 @@ export default function SettingsPage() {
     }
     getProfile();
   }, []);
+const handleCancel = async () => {
+  // 1. Confirmation Dialog
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: "Your PRO features will remain active until the end of your current billing period, but the subscription will not renew.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33', // Red for cancellation
+    cancelButtonColor: '#3085d6', // Blue for keeping it
+    confirmButtonText: 'Yes, cancel subscription',
+    cancelButtonText: 'No, keep it',
+    background: '#111827', // Dark background to match your UI
+    color: '#fff'
+  });
+
+  if (result.isConfirmed) {
+    // 2. Show Loading State
+    Swal.fire({
+      title: 'Processing...',
+      text: 'Please wait while we update your subscription.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    try {
+      const res = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          subscriptionId: profile?.paypal_subscription_id, 
+          userId: profile?.id 
+        }),
+      });
+
+      if (res.ok) {
+        // 3. Success Message
+        await Swal.fire({
+          icon: 'success',
+          title: 'Cancelled!',
+          text: 'Your auto-renewal has been successfully turned off.',
+          confirmButtonText: 'Got it',
+          timer: 4000
+        });
+        window.location.reload();
+      } else {
+        throw new Error('Failed to cancel');
+      }
+    } catch (error) {
+      // 4. Error Message
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong while communicating with PayPal. Please try again later.',
+        confirmButtonText: 'Okay'
+      });
+    }
+  }
+};
+// في الـ JSX:
+
 
   if (loading) return <div className="p-10 text-center">Loading...</div>;
 
@@ -80,8 +142,14 @@ export default function SettingsPage() {
               rel="noopener noreferrer"
               className="inline-flex cursor-pointer items-center justify-center w-full px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-semibold"
             >
-              Manage Billing or Cancel Subscription
+               Cancel Subscription from PayPal
             </a>
+            <button 
+  onClick={handleCancel}
+  className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+>
+  Cancel Subscription Directly
+</button>
           </div>
         </div>
       ) : (
