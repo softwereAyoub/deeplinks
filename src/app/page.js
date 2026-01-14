@@ -537,7 +537,7 @@ Stop wasting hours on manual updates. Redirect 100+ TikTok accounts instantly fr
                 <span className="text-[22px] font-bold tracking-[1px]  text-slate-900 dark:text-white translate-x-[-14px]">ireop</span>
               </div>
               <p className="text-slate-400 dark:text-slate-500 max-w-sm text-sm">
-Empowering TikTok automation and link management with seamless bulk control since 2024.                </p>
+Empowering TikTok automation and link management with seamless bulk control since 2025.                </p>
             </div>
             <div>
               <h4 className="font-bold mb-4 text-sm uppercase tracking-widest text-slate-900 dark:text-white">Legal</h4>
