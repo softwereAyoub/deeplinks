@@ -27,7 +27,7 @@ description: "The essential link management toolkit for automation experts. Opti
   authors: [{ name: 'Direop' }],
   icons: {
     icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    // apple: '/apple-touch-icon.png',
   },
 };
 
