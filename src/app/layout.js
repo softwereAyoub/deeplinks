@@ -26,7 +26,8 @@ default: "Direop | Smart Link Solutions for Automation Pros",
 description: "The essential link management toolkit for automation experts. Optimize, track, and manage your links seamlessly within your automated workflows. Simple, powerful, and built for scale.",  keywords: ['link management for automation', 'automation tools','TikTok Automation', 'smart links', 'URL optimization', 'Direop'],
   authors: [{ name: 'Direop' }],
   icons: {
-    icon: '/log.ico',
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 };
 
